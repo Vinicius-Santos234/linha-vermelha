@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 430" role="img" aria-label="Identidade visual: superfícies cinza-carvão, gradiente quente no Ataque, gradiente frio na Defesa e botões em pílula com borda em gradiente.">
+  <defs>
+    <linearGradient id="quente" x1="0" x2="1">
+      <stop offset="0" stop-color="#ea4335"/><stop offset=".55" stop-color="#ff8a1f"/><stop offset="1" stop-color="#fdc830"/>
+    </linearGradient>
+    <linearGradient id="frio" x1="0" x2="1">
+      <stop offset="0" stop-color="#4c8df6"/><stop offset=".55" stop-color="#a078e0"/><stop offset="1" stop-color="#e8708a"/>
+    </linearGradient>
+    <linearGradient id="completo" x1="0" x2="1">
+      <stop offset="0" stop-color="#4c8df6"/><stop offset=".35" stop-color="#a078e0"/><stop offset=".62" stop-color="#e8708a"/><stop offset="1" stop-color="#ff8a1f"/>
+    </linearGradient>
+  </defs>
+  <style>
+    .rotulo { font: 600 13px 'Segoe UI', system-ui, sans-serif; letter-spacing: 1.2px; fill: #9aa0a6; }
+    .nome { font: 600 15px 'Segoe UI', system-ui, sans-serif; fill: #e3e3e3; }
+    .hex { font: 13px ui-monospace, 'Cascadia Code', Consolas, monospace; fill: #9aa0a6; }
+    .botao { font: 700 16px 'Segoe UI', system-ui, sans-serif; fill: #fff; }
+  </style>
+
+  <rect width="1200" height="430" rx="24" fill="#131314"/>
+
+  <!-- Os gradientes. -->
+  <text x="48" y="54" class="rotulo">GRADIENTES</text>
+  <rect x="48" y="72" width="344" height="64" rx="16" fill="url(#quente)"/>
+  <text x="48" y="162" class="nome">Quente · Ataque</text>
+  <text x="48" y="182" class="hex">#ea4335 → #ff8a1f → #fdc830</text>
+
+  <rect x="428" y="72" width="344" height="64" rx="16" fill="url(#frio)"/>
+  <text x="428" y="162" class="nome">Frio · Defesa</text>
+  <text x="428" y="182" class="hex">#4c8df6 → #a078e0 → #e8708a</text>
+
+  <rect x="808" y="72" width="344" height="64" rx="16" fill="url(#completo)"/>
+  <text x="808" y="162" class="nome">Completo · Ciclo e títulos</text>
+  <text x="808" y="182" class="hex">frio → quente</text>
+
+  <!-- As superfícies. -->
+  <text x="48" y="238" class="rotulo">SUPERFÍCIES E TEXTO</text>
+  <g>
+    <rect x="48" y="256" width="96" height="56" rx="14" fill="#131314" stroke="#3c4043"/>
+    <rect x="160" y="256" width="96" height="56" rx="14" fill="#1e1f20" stroke="#3c4043"/>
+    <rect x="272" y="256" width="96" height="56" rx="14" fill="#282a2c" stroke="#3c4043"/>
+    <rect x="384" y="256" width="96" height="56" rx="14" fill="#333537" stroke="#3c4043"/>
+    <rect x="496" y="256" width="96" height="56" rx="14" fill="#e3e3e3"/>
+    <rect x="608" y="256" width="96" height="56" rx="14" fill="#9aa0a6"/>
+  </g>
+  <g class="hex">
+    <text x="48" y="334">#131314</text><text x="160" y="334">#1e1f20</text><text x="272" y="334">#282a2c</text>
+    <text x="384" y="334">#333537</text><text x="496" y="334">#e3e3e3</text><text x="608" y="334">#9aa0a6</text>
+  </g>
+  <g class="hex" fill="#c4c7c5">
+    <text x="48" y="354">fundo</text><text x="160" y="354">cartão</text><text x="272" y="354">realce</text>
+    <text x="384" y="354">ativo</text><text x="496" y="354">texto</text><text x="608" y="354">texto fraco</text>
+  </g>
+
+  <!-- Os sinais. -->
+  <text x="760" y="238" class="rotulo">SINAIS</text>
+  <rect x="760" y="256" width="56" height="56" rx="14" fill="#1f2b23"/>
+  <text x="788" y="292" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="22" font-weight="700" fill="#81c995">✓</text>
+  <rect x="828" y="256" width="56" height="56" rx="14" fill="#282a2c"/>
+  <text x="856" y="290" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="22" fill="#9aa0a6">·</text>
+  <rect x="896" y="256" width="56" height="56" rx="14" fill="#5a2320" stroke="#ea4335" stroke-width="2"/>
+  <text x="924" y="292" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="22" font-weight="700" fill="#fff">✓</text>
+  <g class="hex" fill="#c4c7c5">
+    <text x="760" y="334">vê</text><text x="828" y="334">não vê</text><text x="896" y="334">vê e não devia</text>
+  </g>
+  <text x="1040" y="282" font-family="'Segoe UI', system-ui, sans-serif" font-size="26" fill="#fdc830" letter-spacing="3">★★★</text>
+  <text x="1040" y="334" class="hex" fill="#c4c7c5">estrelas</text>
+
+  <!-- Os botões. -->
+  <rect x="48" y="376" width="118" height="40" rx="20" fill="#1e1f20" stroke="url(#quente)" stroke-width="2"/>
+  <text x="107" y="402" text-anchor="middle" class="botao">Atacar</text>
+  <rect x="182" y="376" width="134" height="40" rx="20" fill="#1e1f20" stroke="url(#frio)" stroke-width="2"/>
+  <text x="249" y="402" text-anchor="middle" class="botao">Defender</text>
+  <rect x="332" y="376" width="178" height="40" rx="20" fill="#1e1f20" stroke="url(#completo)" stroke-width="2"/>
+  <text x="421" y="402" text-anchor="middle" class="botao">Ciclo completo</text>
+  <text x="530" y="402" class="hex" fill="#c4c7c5">botões em pílula: escuros por dentro, a cor só na borda</text>
+</svg>

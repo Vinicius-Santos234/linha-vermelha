@@ -1,0 +1,22 @@
+[
+  {
+    "tipo": "auth",
+    "metodo": "signInWithPassword",
+    "email": "alice@exemplo.com",
+    "senha": "paodequeijo"
+  },
+  {
+    "tipo": "auth",
+    "metodo": "updateUser",
+    "dados": {
+      "papel": "gerente"
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "pedidos",
+    "operacao": "select",
+    "filtros": [],
+    "colunas": "*"
+  }
+]

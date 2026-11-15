@@ -1,0 +1,14 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>Prova do PGlite no navegador</title>
+<pre id="saida">rodando…</pre>
+<script type="module">
+  // window.rodar(pacote) devolve o resultado da prova rodada dentro de um Worker.
+  window.rodar = (pacote) =>
+    new Promise((resolver) => {
+      const worker = new Worker('/provas/navegador/worker.js', { type: 'module' })
+      worker.onmessage = (e) => (worker.terminate(), resolver(e.data))
+      worker.onerror = (e) => resolver({ erro: `erro no worker: ${e.message}` })
+      worker.postMessage(pacote)
+    })
+</script>

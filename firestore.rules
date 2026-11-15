@@ -1,0 +1,17 @@
+rules_version = '2';
+
+// O "RLS do Firebase". Cada jogador lê e escreve só o próprio documento de progresso,
+// e nada mais existe para ninguém. Testado no emulador: npm run prova:regras.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /progresso/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+
+      // Sem delete. O documento só pode ter o progresso e a data.
+      allow create, update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['fases', 'atualizadoEm'])
+        && request.resource.data.fases is map;
+    }
+  }
+}

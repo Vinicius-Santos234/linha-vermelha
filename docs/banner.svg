@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" role="img" aria-label="Linha Vermelha. Red-Line (Security). Invada e conserte Row Level Security.">
+  <defs>
+    <linearGradient id="quente" x1="0" x2="1">
+      <stop offset="0" stop-color="#ea4335"/><stop offset=".55" stop-color="#ff8a1f"/><stop offset="1" stop-color="#fdc830"/>
+    </linearGradient>
+    <linearGradient id="frio" x1="0" x2="1">
+      <stop offset="0" stop-color="#4c8df6"/><stop offset=".55" stop-color="#a078e0"/><stop offset="1" stop-color="#e8708a"/>
+    </linearGradient>
+    <linearGradient id="completo" x1="0" x2="1">
+      <stop offset="0" stop-color="#4c8df6"/><stop offset=".35" stop-color="#a078e0"/><stop offset=".62" stop-color="#e8708a"/><stop offset="1" stop-color="#ff8a1f"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="360" rx="28" fill="#131314"/>
+  <rect x="1" y="1" width="1198" height="358" rx="27" fill="none" stroke="url(#completo)" stroke-width="2"/>
+
+  <!-- A grade "quem vê o quê": o que cada usuário enxerga, com o vazamento em vermelho. -->
+  <g font-family="ui-monospace, 'Cascadia Code', Consolas, monospace" font-size="15" fill="#9aa0a6">
+    <text x="868" y="92" text-anchor="middle">#1</text><text x="928" y="92" text-anchor="middle">#2</text>
+    <text x="988" y="92" text-anchor="middle">#5</text><text x="1048" y="92" text-anchor="middle">#7</text>
+    <text x="826" y="134" text-anchor="end" fill="#e3e3e3">alice</text>
+    <text x="826" y="190" text-anchor="end" fill="#e3e3e3">bruno</text>
+    <text x="826" y="246" text-anchor="end" fill="#e3e3e3">anon</text>
+  </g>
+  <g>
+    <rect x="842" y="106" width="52" height="44" rx="11" fill="#1f2b23"/><rect x="902" y="106" width="52" height="44" rx="11" fill="#1f2b23"/>
+    <rect x="962" y="106" width="52" height="44" rx="11" fill="#282a2c"/>
+    <rect x="1022" y="106" width="52" height="44" rx="11" fill="#5a2320" stroke="#ea4335" stroke-width="2"/>
+    <rect x="842" y="162" width="52" height="44" rx="11" fill="#282a2c"/><rect x="902" y="162" width="52" height="44" rx="11" fill="#282a2c"/>
+    <rect x="962" y="162" width="52" height="44" rx="11" fill="#1f2b23"/><rect x="1022" y="162" width="52" height="44" rx="11" fill="#1f2b23"/>
+    <rect x="842" y="218" width="52" height="44" rx="11" fill="#282a2c"/><rect x="902" y="218" width="52" height="44" rx="11" fill="#282a2c"/>
+    <rect x="962" y="218" width="52" height="44" rx="11" fill="#282a2c"/>
+    <rect x="1022" y="218" width="52" height="44" rx="11" fill="#5a2320" stroke="#ea4335" stroke-width="2"/>
+  </g>
+  <g font-family="'Segoe UI', system-ui, sans-serif" font-size="20" font-weight="700" text-anchor="middle">
+    <text x="868" y="135" fill="#81c995">✓</text><text x="928" y="135" fill="#81c995">✓</text>
+    <text x="1048" y="135" fill="#fff">✓</text>
+    <text x="988" y="191" fill="#81c995">✓</text><text x="1048" y="191" fill="#81c995">✓</text>
+    <text x="1048" y="247" fill="#fff">✓</text>
+  </g>
+  <text x="958" y="298" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" fill="#9aa0a6">em vermelho: quem vê o que não devia</text>
+
+  <!-- A marca. -->
+  <rect x="72" y="92" width="74" height="7" rx="3.5" fill="url(#quente)"/>
+  <text x="70" y="176" font-family="'Segoe UI Variable Display', 'Segoe UI', system-ui, sans-serif" font-size="78" font-weight="600" letter-spacing="-2.5" fill="url(#completo)">Linha Vermelha</text>
+  <text x="74" y="222" font-family="'Segoe UI', system-ui, sans-serif" font-size="24" fill="#e3e3e3">Invada e conserte Row Level Security,</text>
+  <text x="74" y="254" font-family="'Segoe UI', system-ui, sans-serif" font-size="24" fill="#e3e3e3">num Postgres de verdade dentro da sua aba.</text>
+
+  <rect x="74" y="284" width="212" height="34" rx="17" fill="#131314" stroke="url(#quente)" stroke-width="2"/>
+  <text x="180" y="307" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="15" font-weight="700" fill="#fff">Red-Line (Security)</text>
+  <text x="302" y="307" font-family="'Segoe UI', system-ui, sans-serif" font-size="15" fill="#9aa0a6">as iniciais dão RLS</text>
+</svg>

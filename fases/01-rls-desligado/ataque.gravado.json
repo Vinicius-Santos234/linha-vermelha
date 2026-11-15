@@ -1,0 +1,9 @@
+[
+  {
+    "tipo": "from",
+    "tabela": "pedidos",
+    "operacao": "select",
+    "filtros": [],
+    "colunas": "*"
+  }
+]

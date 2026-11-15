@@ -1,0 +1,14 @@
+node_modules/
+.next/
+out/
+provas/.saida/
+*.log
+.env*
+!.env.example
+out-emulador/
+out-prova/
+*-debug.log
+public/pglite-*/
+jogo/fases.gerado.ts
+next-env.d.ts
+*.tsbuildinfo

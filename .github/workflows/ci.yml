@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      # D9: toda fase tem que cair no ataque de referência e passar com o conserto de referência.
+      - run: npm test
+      - run: npm run prova:node
+      - run: npm run build
+      # As regras do Firestore, no emulador (o runner já traz Java).
+      - run: npm run prova:regras

@@ -1,0 +1,30 @@
+[
+  {
+    "tipo": "auth",
+    "metodo": "signInWithPassword",
+    "email": "alice@exemplo.com",
+    "senha": "paodequeijo"
+  },
+  {
+    "tipo": "from",
+    "tabela": "perfis",
+    "operacao": "update",
+    "filtros": [
+      {
+        "coluna": "id",
+        "op": "eq",
+        "valor": "a11ce000-0000-4000-8000-000000000001"
+      }
+    ],
+    "valores": {
+      "is_admin": true
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "pedidos",
+    "operacao": "select",
+    "filtros": [],
+    "colunas": "*"
+  }
+]

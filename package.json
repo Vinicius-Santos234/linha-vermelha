@@ -1,0 +1,53 @@
+{
+  "name": "linha-vermelha",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Jogo no navegador para invadir e consertar políticas de Row Level Security.",
+  "scripts": {
+    "gerar": "node scripts/gerar.mjs",
+    "gravar": "node scripts/gravar.mjs",
+    "predev": "node scripts/gerar.mjs",
+    "dev": "next dev",
+    "prebuild": "node scripts/gerar.mjs",
+    "build": "next build",
+    "postbuild": "node scripts/pos-build.mjs",
+    "test": "vitest run",
+    "pretypecheck": "node scripts/gerar.mjs",
+    "typecheck": "tsc --noEmit",
+    "prova:node": "node provas/01-node.mjs",
+    "prova:navegador": "node provas/02-navegador.mjs",
+    "prova:jogador": "node provas/03-worker-jogador.mjs",
+    "prova:site": "node provas/04-site.mjs",
+    "prova:regras": "npx -y firebase-tools@13.35.1 emulators:exec --only firestore --project demo-linha-vermelha \"vitest run --config vitest.regras.config.ts\"",
+    "prova:nuvem": "npx -y firebase-tools@13.35.1 emulators:exec --only auth,firestore --project demo-linha-vermelha \"node provas/05-nuvem.mjs\"",
+    "gif": "node scripts/gif.mjs"
+  },
+  "dependencies": {
+    "@codemirror/commands": "6.11.1",
+    "@codemirror/lang-javascript": "6.2.5",
+    "@codemirror/lang-sql": "6.10.0",
+    "@codemirror/language": "6.13.1",
+    "@codemirror/state": "6.7.6",
+    "@codemirror/view": "6.43.15",
+    "@electric-sql/pglite": "0.2.17",
+    "@lezer/highlight": "1.2.5",
+    "codemirror": "6.0.2",
+    "firebase": "13.3.0",
+    "next": "16.4.6",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "6.0.0",
+    "@types/node": "26.6.6",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "gifenc": "1.0.3",
+    "playwright-core": "1.65.1",
+    "pngjs": "7.0.0",
+    "rolldown": "1.2.19",
+    "typescript": "7.0.2",
+    "vitest": "5.1.0"
+  }
+}
