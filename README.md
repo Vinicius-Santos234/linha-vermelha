@@ -100,14 +100,32 @@ A interface parte do tema escuro dos consoles de nuvem (a referência foi o cons
 - **A cor diz em que modo você está.** O gradiente quente (vermelho, laranja, amarelo) é do Ataque. O frio (azul, roxo, rosa) é da Defesa. O completo, que vai de um ao outro, é do Ciclo e dos títulos.
 - **Gradiente na borda e no texto, quase nunca no preenchimento.** Os cartões e botões são escuros por dentro, e só o contorno carrega a cor. O conteúdo continua legível, e a tela não vira um carnaval. As exceções são de propósito: o botão **Jogar** da abertura e os carimbos de vitória, que são as únicas coisas da tela pedindo para serem vistas primeiro.
 - **A abertura mostra o jogo em vez de descrevê-lo.** Um console se digita sozinho, traz o pedido que não devia, carimba "Você cruzou a linha", vira para a Defesa e fecha a grade. Quem chega entende a proposta em dez segundos, sem ler.
-- **A linha vermelha é a trilha de progresso.** As fases são pontos numa linha que acende até onde você chegou. Os pontos trancados e os que ainda vêm ficam apagados, à frente. Tocar num ponto mostra a fase.
+- **Um mar de caracteres.** O fundo inteiro da abertura e do mapa é um mar em ASCII: cristas de `~`, `-` e `.` passando devagar num canvas escuro, com um `0` ou um `1` à deriva de vez em quando. É fundo de verdade: apagado o bastante para o texto passar por cima.
+- **O mapa de fases é um mapa do tesouro.** Cada fase é uma ilha em forma de peça de computador (pente de RAM, SSD, cooler, placa-mãe, CPU, placa de vídeo, fonte, roteador, chip, servidor, disco rígido), ligada à seguinte por uma rota pontilhada. A rota acende até onde você chegou, as ilhas trancadas ficam apagadas, e no fim dela está o X do tesouro: o nível 4, que ainda vem. No celular a rota desce em zigue-zague.
+- **Um fundo para cada página, tirado do que ela faz.** Nenhuma página fica só com o fundo escuro, e nenhuma repete a de outra:
+
+  | Página | Fundo | O que ele mostra |
+  |---|---|---|
+  | Ataque | Um despejo de bytes em hexadecimal, com a linha de um scanner descendo | Ao vencer, uma linha vermelha fica acesa atravessando a tela: a linha foi cruzada |
+  | Defesa | Uma malha de hexágonos, como um escudo | Cada divergência da grade é um hexágono rachado em vermelho. Com tudo consertado, a malha sela |
+  | Laboratório | A tela de um osciloscópio | Um traço de sinal para cada usuário do experimento |
+  | Perfil | Um céu de constelações | Cada fase é uma constelação de nove estrelas, e cada estrela ganha acende |
+  | Desafio diário | Um mostrador de 24 horas | O arco aceso é o quanto do dia já passou. Ao lado, a contagem até a troca e os últimos sete dias |
+  | Ajuda | Um caderno pautado, com a margem vermelha | Fica parado, para ler, com um sumário que acompanha a rolagem |
+  | Página não encontrada | Mar aberto | "Fora do mapa" |
+
+- **A linha vermelha é a trilha de progresso.** Na abertura, as fases são pontos numa linha que acende até onde você chegou. Tocar num ponto mostra a fase.
 - **Patente e estrelas.** O progresso aparece como num jogo: uma barra, um total de estrelas e um título que sobe de Visitante a Lenda da linha.
 - **Botões em pílula.** A ação principal tem borda em gradiente e brilha de leve ao passar o mouse. A secundária tem borda cinza.
 - **Vermelho com um significado só.** Na grade "quem vê o quê", vermelho quer dizer que a política diverge do que deveria ser. Ele não aparece como enfeite em nenhum outro lugar da Defesa.
 - **Código em primeiro plano.** Editor [CodeMirror 6](https://codemirror.net) com tema próprio, na mesma paleta, e fonte monoespaçada em tudo o que é dado: schema, respostas, grade e testes.
 - **Sem biblioteca de estilo.** É CSS puro com variáveis, num arquivo só (`app/globals.css`). As fontes são as do sistema: nada é baixado para desenhar a tela.
 - **Do celular ao monitor largo.** A 390 px a página não rola para o lado, e isso é conferido pela prova do site.
-- **Respeita `prefers-reduced-motion`:** sem movimento, a cena da abertura fica parada no vazamento. A grade descreve cada célula em texto para leitor de tela, e a cena tem uma descrição escrita.
+- **Respeita `prefers-reduced-motion`:** sem movimento, a cena da abertura fica parada no vazamento e o mar vira um quadro só. A grade descreve cada célula em texto para leitor de tela, e a cena tem uma descrição escrita.
+
+<p align="center">
+  <img src="docs/mapa.png" alt="O mapa de fases: ilhas em forma de peça de computador, ligadas por uma rota pontilhada, num mar em ASCII" width="100%">
+</p>
 
 <p align="center">
   <img src="docs/inicio.png" alt="A abertura: o logotipo com a linha acesa, o botão de jogar e a cena do ataque" width="49%">

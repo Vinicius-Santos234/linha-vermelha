@@ -374,7 +374,7 @@ table.dados tr.escondida td { color: #5f6368; text-decoration: line-through; tex
 .so-leitor { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 .palco { position: relative; overflow: hidden; isolation: isolate; }
-/* Duas luzes, uma quente e uma fria, e uma malha que some para as bordas. */
+/* Duas luzes, uma quente e uma fria, por baixo do mar de caracteres. */
 .palco::before {
   content: '';
   position: absolute;
@@ -383,11 +383,7 @@ table.dados tr.escondida td { color: #5f6368; text-decoration: line-through; tex
   z-index: -1;
   background:
     radial-gradient(46% 52% at 12% 4%, rgba(234, 67, 53, 0.2), transparent 70%),
-    radial-gradient(40% 46% at 92% 12%, rgba(76, 141, 246, 0.17), transparent 70%),
-    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px) 0 0 / 46px 46px,
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px) 0 0 / 46px 46px;
-  -webkit-mask-image: linear-gradient(#000 35%, transparent);
-  mask-image: linear-gradient(#000 35%, transparent);
+    radial-gradient(40% 46% at 92% 12%, rgba(76, 141, 246, 0.17), transparent 70%);
 }
 
 .heroi {
@@ -627,3 +623,193 @@ table.dados tr.escondida td { color: #5f6368; text-decoration: line-through; tex
 
 .diario-cartao small { display: block; }
 .inicio .cartao > h2 { margin-top: 0; }
+
+/* =====================================================================
+   O mar em ASCII e o mapa de fases
+   ===================================================================== */
+
+.mar { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+/* Na abertura o mar cobre a página inteira, por baixo de tudo. */
+
+.mapa-pagina { position: relative; isolation: isolate; overflow: hidden; min-height: calc(100vh - 62px); }
+.mapa-moldura { max-width: 1280px; margin: 0 auto; padding: 34px 24px 28px; }
+.mapa-titulo h1 { font-size: clamp(32px, 5vw, 48px); line-height: 1.08; letter-spacing: -0.03em; }
+.mapa-titulo p { color: var(--texto-2); margin: 8px 0 0; max-width: 620px; }
+
+.mapa { position: relative; width: 100%; margin-top: 8px; }
+.rota { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.rota path { fill: none; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+/* A rota de mapa do tesouro: pontilhada, e acesa até onde o jogador chegou. */
+.rota-apagada { stroke: #4a4f55; stroke-width: 3.5; stroke-dasharray: 1 13; }
+.rota-acesa { stroke: url(#rota-quente); stroke-width: 4.5; stroke-dasharray: 1 13; filter: drop-shadow(0 0 6px rgba(255, 138, 31, 0.9)); }
+
+.mapa-bussola { position: absolute; width: 8.5%; min-width: 64px; transform: translate(-50%, -50%); opacity: 0.75; }
+.bussola { display: block; width: 100%; overflow: visible; }
+.bussola circle, .bussola path { fill: none; stroke: #6b7178; stroke-width: 1.4; }
+.bussola .agulha { fill: rgba(234, 67, 53, 0.55); stroke: var(--vermelho); }
+.bussola text { fill: #9aa0a6; font: 700 13px var(--mono); }
+
+.ilha {
+  --arte: #7b8189;
+  --arte-fundo: #24262a;
+  --arte-destaque: #3d4147;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: transform 0.16s;
+}
+.ilha:hover, .ilha:focus-visible { transform: translate(-50%, -50%) scale(1.06); z-index: 2; }
+.ilha.tesouro { cursor: default; }
+.ilha.tesouro:hover { transform: translate(-50%, -50%); }
+
+/* A terra: uma mancha irregular, com a água rasa em volta. */
+.terra {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1.22;
+  padding: 13%;
+  background: #17191b;
+  border: 1.5px dashed #3a3e44;
+  box-shadow: 0 0 0 9px rgba(76, 141, 246, 0.07), 0 0 0 20px rgba(76, 141, 246, 0.035), 0 18px 40px -18px #000;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.forma-0 .terra { border-radius: 58% 42% 55% 45% / 48% 58% 42% 52%; }
+.forma-1 .terra { border-radius: 44% 56% 48% 52% / 56% 44% 56% 44%; }
+.forma-2 .terra { border-radius: 52% 48% 40% 60% / 42% 54% 46% 58%; }
+.forma-3 .terra { border-radius: 47% 53% 60% 40% / 58% 46% 54% 42%; }
+
+.arte { display: block; width: 100%; overflow: visible; }
+.arte .f { fill: var(--arte-fundo); stroke: var(--arte); stroke-width: 1.6; stroke-linejoin: round; }
+.arte .t { fill: none; stroke: var(--arte); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.arte .f.t { fill: var(--arte-fundo); }
+.arte .d { fill: var(--arte-destaque); stroke: none; }
+.arte .x { fill: none; stroke: var(--vermelho); stroke-width: 4; stroke-linecap: round; filter: drop-shadow(0 0 5px var(--vermelho)); }
+
+.ilha.aberta { --arte: #ffb469; --arte-fundo: #2a211a; --arte-destaque: #ff8a1f; }
+.ilha.aberta .terra { border-color: var(--laranja); border-style: solid; box-shadow: 0 0 0 9px rgba(255, 138, 31, 0.1), 0 0 0 20px rgba(255, 138, 31, 0.045), 0 0 44px -8px var(--laranja); animation: chamar-ilha 2.6s ease-in-out infinite; }
+.ilha.vencida { --arte: #ffd98a; --arte-fundo: #2c2416; --arte-destaque: #fdc830; }
+.ilha.vencida .terra { border-color: #8a6a1c; border-style: solid; box-shadow: 0 0 0 9px rgba(253, 200, 48, 0.07), 0 0 0 20px rgba(253, 200, 48, 0.03), 0 0 30px -12px var(--amarelo); }
+.ilha.trancada .terra { opacity: 0.78; }
+.ilha.tesouro { --arte: #8f959c; }
+.ilha.tesouro .terra { border-color: #5b3330; }
+.ilha.escolhida .terra { outline: 3px solid #fff; outline-offset: 5px; }
+@keyframes chamar-ilha { 50% { box-shadow: 0 0 0 13px rgba(255, 138, 31, 0.06), 0 0 0 28px rgba(255, 138, 31, 0.025), 0 0 60px -6px var(--laranja); } }
+
+.bandeira { position: absolute; top: -4%; left: 4%; min-width: 34px; padding: 2px 8px; border-radius: 999px; background: var(--fundo); border: 1.5px solid #4a4f55; font: 700 13px var(--titulos); color: var(--texto-3); }
+.ilha.aberta .bandeira { border-color: var(--laranja); color: #fff; }
+.ilha.vencida .bandeira { border-color: transparent; background: var(--quente); color: #1c0a00; }
+.saldo { position: absolute; top: -4%; right: 2%; padding: 2px 8px; border-radius: 999px; background: var(--fundo); border: 1px solid #5a4a1a; font: 700 12px var(--sans); color: var(--amarelo); white-space: nowrap; }
+
+.ilha .nome { display: flex; flex-direction: column; align-items: center; gap: 1px; text-align: center; padding: 3px 10px; border-radius: 10px; background: rgba(19, 19, 20, 0.82); }
+.ilha .nome b { font: 600 14px/1.25 var(--titulos); color: #fff; }
+.ilha .nome small { font: 12px var(--mono); color: var(--texto-3); }
+.ilha.trancada .nome b, .ilha.tesouro .nome b { color: var(--texto-3); }
+
+/* O cartão da ilha escolhida acompanha a rolagem, colado ao pé da tela. */
+.mapa-painel { position: sticky; bottom: 16px; z-index: 3; max-width: 760px; margin: 26px auto 0; }
+.mapa-painel .ponto-cartao { background: rgba(30, 31, 32, 0.94); backdrop-filter: blur(8px); box-shadow: 0 20px 50px -20px #000; }
+.mapa-painel .ponto-cartao.trancado { background: rgba(24, 25, 26, 0.94); border-style: dashed; }
+.mapa-painel .ponto-cartao.trancado h3 { color: var(--texto-3); }
+
+@media (max-width: 760px) {
+  .mapa-moldura { padding: 24px 12px 20px; }
+  .ilha .nome b { font-size: 13px; }
+  .mapa-bussola { width: 17%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ilha { transition: none; }
+  .ilha.aberta .terra { animation: none; }
+}
+
+/* =====================================================================
+   Um fundo para cada página
+   ===================================================================== */
+
+/* Os fundos animados ficam presos à janela, por baixo de tudo. */
+.fundo { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+
+/* ---------- Perfil: os números sobre o céu ---------- */
+.numeros { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 26px; }
+.numeros > div { padding: 16px 18px; border-radius: 16px; background: rgba(30, 31, 32, 0.82); border: 1px solid var(--borda); backdrop-filter: blur(6px); }
+.numeros b { display: block; font: 600 26px/1.15 var(--titulos); color: #fff; letter-spacing: -0.02em; }
+.numeros small { color: var(--texto-3); font-size: 12.5px; }
+.linha-de-perfil { background: rgba(30, 31, 32, 0.82); backdrop-filter: blur(6px); }
+
+/* ---------- Desafio diário: o mostrador de 24 horas ---------- */
+.diario-fundo { position: relative; isolation: isolate; overflow: hidden; min-height: calc(100vh - 62px); }
+.relogio { position: absolute; z-index: -1; top: -30px; right: -120px; width: min(620px, 92vw); opacity: 0.6; pointer-events: none; }
+.relogio .aro { fill: none; stroke: #33373d; stroke-width: 2; }
+.relogio .aro.fino { stroke: #2a2d32; stroke-width: 1; stroke-dasharray: 2 6; }
+.relogio .marca { stroke: #3d4248; stroke-width: 1; }
+.relogio .marca.hora { stroke: #5b6168; stroke-width: 1.6; }
+.relogio text { fill: #6b7178; font: 600 13px var(--mono); }
+.relogio .arco { fill: none; stroke: url(#relogio-arco); stroke-width: 6; stroke-linecap: round; filter: drop-shadow(0 0 8px rgba(160, 120, 224, 0.8)); }
+.relogio .ponteiro { stroke: #9aa0a6; stroke-width: 1.6; stroke-linecap: round; }
+.relogio .eixo { fill: #9aa0a6; }
+.relogio .ponta { fill: #fff; filter: drop-shadow(0 0 8px var(--laranja)); }
+
+.prazo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 28px; margin-top: 18px; padding: 16px 20px; border-radius: 16px; background: rgba(30, 31, 32, 0.8); border: 1px solid var(--borda); }
+.prazo b { display: block; font: 600 22px var(--titulos); color: #fff; font-variant-numeric: tabular-nums; }
+.prazo small { color: var(--texto-3); font-size: 12.5px; }
+.semana { display: flex; gap: 10px; list-style: none; margin: 0; padding: 0; }
+.semana li { display: flex; flex-direction: column; align-items: center; gap: 5px; font: 600 11.5px var(--mono); color: var(--texto-3); }
+.semana i { width: 22px; height: 22px; border-radius: 7px; background: var(--superficie-3); display: block; }
+.semana .feito i { background: var(--completo); box-shadow: 0 0 12px -2px var(--rosa); }
+.semana .hoje i { outline: 2px solid #fff; outline-offset: 2px; }
+.semana .hoje { color: #fff; }
+
+/* ---------- Ajuda: um caderno pautado, com a margem vermelha ---------- */
+.caderno {
+  --pauta: 30px;
+  position: relative;
+  display: grid;
+  grid-template-columns: 250px minmax(0, 760px);
+  gap: 56px;
+  justify-content: center;
+  padding: 44px 24px 90px;
+  background: repeating-linear-gradient(transparent 0 calc(var(--pauta) - 1px), rgba(140, 170, 220, 0.055) calc(var(--pauta) - 1px) var(--pauta));
+}
+/* A margem do caderno: a linha vermelha. */
+.caderno::before { content: ''; position: absolute; top: 0; bottom: 0; left: max(24px, calc(50% - 533px + 250px + 28px)); width: 2px; background: var(--vermelho); opacity: 0.55; box-shadow: 0 0 14px rgba(234, 67, 53, 0.7); }
+.caderno > * { min-width: 0; }
+.caderno .documento { max-width: none; padding-left: 8px; }
+.caderno .documento h1 { font-size: clamp(34px, 6vw, 54px); line-height: 1.08; letter-spacing: -0.03em; margin-bottom: 12px; }
+.caderno .abertura { font-size: 18px; color: var(--texto-2); }
+.caderno section { scroll-margin-top: 84px; }
+.caderno .documento h2 { display: flex; align-items: baseline; gap: 12px; margin-top: 46px; }
+.caderno .documento h2 span { font: 600 13px var(--mono); color: var(--vermelho); letter-spacing: 0.04em; }
+
+.sumario { position: sticky; top: 92px; align-self: start; }
+.sumario h2 { font: 600 12px var(--sans); letter-spacing: 0.08em; text-transform: uppercase; color: var(--texto-3); margin-bottom: 10px; }
+.sumario ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.sumario a { display: flex; gap: 10px; align-items: baseline; padding: 6px 10px; border-radius: 10px; font-size: 14px; color: var(--texto-3); border-left: 2px solid transparent; }
+.sumario a span { font: 12px var(--mono); color: #5f6368; }
+.sumario a:hover { color: #fff; background: var(--superficie); }
+.sumario a[aria-current='true'] { color: #fff; background: var(--superficie); border-left-color: var(--vermelho); }
+.sumario a[aria-current='true'] span { color: var(--vermelho); }
+
+/* ---------- Página não encontrada: mar aberto ---------- */
+.fora-do-mapa { position: relative; isolation: isolate; overflow: hidden; min-height: calc(100vh - 62px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 40px 24px; text-align: center; }
+.fora-do-mapa .coordenada { margin: 0; font: 600 clamp(90px, 22vw, 200px) / 0.9 var(--mono); letter-spacing: -0.04em; color: transparent; -webkit-text-stroke: 1.5px #4a4f55; }
+.fora-do-mapa h1 { font-size: clamp(30px, 6vw, 46px); letter-spacing: -0.03em; }
+.fora-do-mapa p { color: var(--texto-2); margin: 0 0 8px; }
+
+@media (max-width: 900px) {
+  .caderno { grid-template-columns: minmax(0, 1fr); gap: 26px; padding: 28px 16px 70px; }
+  .caderno::before { left: 8px; }
+  .caderno .documento { padding-left: 14px; }
+  .sumario { position: static; padding-left: 14px; }
+  .sumario ol { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+  .relogio { right: -40%; top: 10px; opacity: 0.4; }
+}

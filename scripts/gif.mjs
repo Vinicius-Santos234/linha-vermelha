@@ -65,6 +65,12 @@ try {
   await pagina.locator('.cena.borda-fria .selo.visivel').waitFor({ timeout: 30000 })
   await quadro(2.4)
 
+  // O mapa de fases.
+  await pagina.goto(`${origem}/fases/`)
+  await pagina.locator('.mapa button.ilha').first().waitFor()
+  await pagina.waitForTimeout(700)
+  await quadro(2.6, 'mapa.png')
+
   // 2. Ataque: o briefing, o código e a vitória.
   await pagina.goto(`${origem}/fase/01-rls-desligado/ataque/`)
   await pagina.getByText('As respostas do app aparecem aqui.').waitFor({ timeout: 60000 })

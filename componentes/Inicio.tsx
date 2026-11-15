@@ -6,7 +6,9 @@ import { gerarDesafio, hoje } from '../desafio/gerar'
 import { fases, fasesAbertas, TOTAL_DO_CATALOGO } from '../jogo/fases'
 import { aoMudarProgresso, lerProgresso, patente, sequencia, totalDeEstrelas, type Modo, type Progresso } from '../jogo/progresso'
 import { t, type Chave } from '../jogo/t'
+import { CartaoDaFase } from './CartaoDaFase'
 import { Cena } from './Cena'
+import { MarAscii } from './MarAscii'
 import { Estrelas } from './Pecas'
 
 const REPOSITORIO = 'https://github.com/Vinicius-Santos234/linha-vermelha'
@@ -118,6 +120,7 @@ export function Inicio() {
 
   return (
     <main className="palco">
+      <MarAscii />
       <section className="heroi">
         <div>
           <span className="pilula borda-quente">{t('marca.sigla')}</span>
@@ -211,27 +214,7 @@ export function Inicio() {
           </ol>
         </div>
 
-        <div className={`ponto-cartao${abertas.includes(escolhida) ? '' : ' trancado'}`} aria-live="polite">
-          <small>
-            {t('inicio.nivel', { n: escolhida.nivel })} · {t('trilha.fase', { n: escolhida.numero })}
-          </small>
-          <h3>{escolhida.texto.titulo}</h3>
-          {abertas.includes(escolhida) ? (
-            <>
-              <p>{escolhida.texto.resumo}</p>
-              <div className="ponto-modos">
-                {MODOS.map(({ modo, curto, borda }) => (
-                  <Link key={modo} className={`chip-modo ${borda}`} href={`/fase/${escolhida.id}/${modo}/`}>
-                    {t(curto)}
-                    <Estrelas quantas={progresso[escolhida.id]?.[modo]?.estrelas ?? 0} rotulo={t(curto)} />
-                  </Link>
-                ))}
-              </div>
-            </>
-          ) : (
-            <p>{t('inicio.trancada')}</p>
-          )}
-        </div>
+        <CartaoDaFase fase={escolhida} aberta={abertas.includes(escolhida)} progresso={progresso} />
         <p className="fraco pequeno" style={{ marginTop: 12 }}>
           {t('trilha.escolha')} {t('trilha.aCaminho', { n: TOTAL_DO_CATALOGO - fases.length })}: {t('trilha.aCaminhoTexto')}
         </p>

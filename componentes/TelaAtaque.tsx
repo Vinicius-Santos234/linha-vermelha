@@ -11,6 +11,7 @@ import type { Definicao, FuncaoDoSchema, PoliticasDaTabela, TabelaDoSchema } fro
 import { t } from '../jogo/t'
 import type { Chamada, RespostaCliente } from '../motor/chamada'
 import { Editor } from './Editor'
+import { Varredura } from './fundos/Varredura'
 import { Carregando, Dicas, ErroDoJogo, Estrelas, Texto, Topo } from './Pecas'
 
 type Entrada =
@@ -108,6 +109,7 @@ export function TelaAtaque({ id, ciclo }: { id: string; ciclo?: { aoAvancar(ataq
 
   return (
     <>
+      <Varredura cruzou={venceu} />
       <Topo faseId={id} titulo={fase.rotulo} modo={ciclo ? 'ciclo' : 'ataque'} estrelas={estrelas} etapa={ciclo && t('ciclo.etapaAtaque')} />
       <main className="fase">
         <div className="coluna">

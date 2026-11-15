@@ -3,8 +3,10 @@
 import { useEffect, useState } from 'react'
 import { conectar, nuvemConfigurada, vincularGoogle, type Conta } from '../jogo/conta'
 import { fases } from '../jogo/fases'
-import { aoMudarProgresso, lerProgresso, type Modo, type Progresso } from '../jogo/progresso'
+import { hoje } from '../desafio/gerar'
+import { aoMudarProgresso, lerProgresso, patente, sequencia, totalDeEstrelas, type Modo, type Progresso } from '../jogo/progresso'
 import { t, type Chave } from '../jogo/t'
+import { Constelacao } from './fundos/Constelacao'
 import { Estrelas, Navegacao } from './Pecas'
 
 const MODOS: { modo: Modo; rotulo: Chave }[] = [
@@ -25,7 +27,10 @@ export function TelaPerfil() {
     return aoMudarProgresso(setProgresso)
   }, [])
 
-  const estrelas = fases.reduce((soma, f) => soma + MODOS.reduce((s, { modo }) => s + (progresso[f.id]?.[modo]?.estrelas ?? 0), 0), 0)
+  const porFase = fases.map((f) => MODOS.reduce((s, { modo }) => s + (progresso[f.id]?.[modo]?.estrelas ?? 0), 0))
+  const estrelas = totalDeEstrelas(progresso)
+  const maximo = fases.length * 9
+  const dias = Object.keys(progresso).filter((id) => id.startsWith('diario-')).length
 
   const vincular = async () => {
     setEstado('vinculando')
@@ -41,11 +46,34 @@ export function TelaPerfil() {
 
   return (
     <>
+      <Constelacao porFase={porFase} />
       <Navegacao atual="perfil" />
       <main className="inicio">
         <h1>
-          <span className="gradiente">{t('perfil.estrelas', { n: estrelas, total: fases.length * 9 })}</span>
+          <span className="gradiente">{t('perfil.estrelas', { n: estrelas, total: maximo })}</span>
         </h1>
+        <p className="abertura">{t('perfil.ceu')}</p>
+
+        <div className="numeros">
+          <div>
+            <b>{t(patente(estrelas, maximo))}</b>
+            <small>{t('perfil.patente')}</small>
+          </div>
+          <div>
+            <b>
+              {porFase.filter((n) => n > 0).length} / {fases.length}
+            </b>
+            <small>{t('perfil.fasesVencidas')}</small>
+          </div>
+          <div>
+            <b>{sequencia(progresso, hoje())}</b>
+            <small>{t('perfil.sequencia')}</small>
+          </div>
+          <div>
+            <b>{dias}</b>
+            <small>{t('perfil.desafios')}</small>
+          </div>
+        </div>
 
         <section className="cartao borda-completa" style={{ marginTop: 28 }}>
           <h2>{t('perfil.conta')}</h2>

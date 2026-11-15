@@ -69,7 +69,7 @@ async function ate(condicao, ms = 15000) {
 
 const checagens = []
 const checar = (nome, ok, detalhe = '') => checagens.push({ nome, ok: !!ok, detalhe: String(detalhe) })
-const estrelas = (pagina) => pagina.locator('.fase-cartao .estrelas .acesa').count()
+const estrelas = (pagina) => pagina.locator('.mapa-painel .estrelas .acesa').count()
 
 let navegador
 try {
@@ -101,7 +101,7 @@ try {
   await pagina.goto(`${origem}/fases/`)
   await pagina.getByRole('link', { name: 'Atacar' }).first().waitFor()
   checar('4. apagado o armazenamento do navegador, as estrelas voltam do Firestore', await ate(async () => (await estrelas(pagina)) === 3), `${await estrelas(pagina)} estrelas`)
-  checar('5. e a fase seguinte volta a estar liberada', (await pagina.locator('.fase-cartao.trancada').count()) === 9)
+  checar('5. e a fase seguinte volta a estar liberada', (await pagina.locator('.ilha.trancada').count()) === 9)
 
   await pagina.goto(`${origem}/perfil/`)
   await pagina.getByRole('button', { name: 'Salvar progresso com Google' }).waitFor({ timeout: 15000 })

@@ -7,6 +7,7 @@ import { hoje } from '../desafio/gerar'
 import { faseDaTela, rotaDe } from '../jogo/fases'
 import { aoMudarProgresso, lerProgresso, sequencia, type Modo, type Progresso } from '../jogo/progresso'
 import { t, type Chave } from '../jogo/t'
+import { Relogio } from './fundos/Relogio'
 import { Estrelas, Navegacao, Texto } from './Pecas'
 import { TelaAtaque } from './TelaAtaque'
 import { TelaCiclo } from './TelaCiclo'
@@ -24,13 +25,25 @@ export function TelaDiario() {
   // A data é a do relógio de quem joga, então só existe depois que a página monta.
   const [data, setData] = useState<string | null>(null)
   const [progresso, setProgresso] = useState<Progresso>({})
+  const [agora, setAgora] = useState<Date | null>(null)
   useEffect(() => {
-    setData(hoje())
+    const marcar = () => {
+      const instante = new Date()
+      setAgora(instante)
+      setData(hoje(instante))
+    }
+    marcar()
     setProgresso(lerProgresso())
-    return aoMudarProgresso(setProgresso)
+    // O relógio anda sozinho, e à meia-noite a página troca de desafio.
+    const relogio = setInterval(marcar, 20_000)
+    const parar = aoMudarProgresso(setProgresso)
+    return () => {
+      clearInterval(relogio)
+      parar()
+    }
   }, [])
 
-  if (!data) return <Navegacao atual="diario" />
+  if (!data || !agora) return <Navegacao atual="diario" />
   const id = `diario-${data}`
   if (modo === 'ataque') return <TelaAtaque key="ataque" id={id} />
   if (modo === 'defesa') return <TelaDefesa key="defesa" id={id} />
@@ -39,10 +52,20 @@ export function TelaDiario() {
   const fase = faseDaTela(id)
   const dias = sequencia(progresso, data)
   const feito = Object.keys(progresso[id] ?? {}).length > 0
+  const minutos = agora.getHours() * 60 + agora.getMinutes()
+  const faltam = 24 * 60 - minutos
+  // Os últimos sete dias, do mais antigo para hoje.
+  const semana = Array.from({ length: 7 }, (_, i) => {
+    const dia = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate() - (6 - i))
+    return { dia, feito: Object.keys(progresso[`diario-${hoje(dia)}`] ?? {}).length > 0 }
+  })
+  const iniciais = t('diario.iniciais').split(',')
   return (
     <>
       <Navegacao atual="diario" />
-      <main className="inicio">
+      <div className="diario-fundo">
+        <Relogio fracao={minutos / (24 * 60)} />
+        <main className="inicio">
         <span className="pilula borda-completa">{t('diario.rotulo')}</span>
         <h1 style={{ marginTop: 18 }}>
           <span className="gradiente">{fase.rotulo}</span>
@@ -67,10 +90,22 @@ export function TelaDiario() {
             ))}
           </div>
         </section>
-        <p className="fraco pequeno" style={{ marginTop: 16 }}>
-          {t('diario.troca')}
-        </p>
-      </main>
+        <div className="prazo">
+          <div>
+            <b>{t('diario.faltam', { h: Math.floor(faltam / 60), m: String(faltam % 60).padStart(2, '0') })}</b>
+            <small>{t('diario.troca')}</small>
+          </div>
+          <ol className="semana" aria-label={t('diario.semana')}>
+            {semana.map(({ dia, feito }, i) => (
+              <li key={i} className={`${feito ? 'feito' : ''}${i === 6 ? ' hoje' : ''}`} aria-label={`${dia.getDate()}/${dia.getMonth() + 1}: ${feito ? t('diario.diaFeito') : t('diario.diaVazio')}`}>
+                <i aria-hidden />
+                <span aria-hidden>{iniciais[dia.getDay()]}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+        </main>
+      </div>
     </>
   )
 }

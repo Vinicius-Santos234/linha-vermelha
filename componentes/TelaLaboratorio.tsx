@@ -7,6 +7,7 @@ import { lerProgresso } from '../jogo/progresso'
 import { t } from '../jogo/t'
 import type { Exploracao, TabelaExplorada } from '../motor/laboratorio'
 import { Editor } from './Editor'
+import { Osciloscopio } from './fundos/Osciloscopio'
 import { Carregando, ErroDoJogo, Navegacao } from './Pecas'
 
 const valor = (v: unknown) => (v === null ? 'null' : typeof v === 'object' ? JSON.stringify(v) : String(v))
@@ -50,6 +51,7 @@ export function TelaLaboratorio() {
 
   return (
     <>
+      <Osciloscopio sinais={usuarios.length || 3} />
       <Navegacao atual="laboratorio" />
       <main className="fase laboratorio">
         <div className="coluna">

@@ -11,6 +11,7 @@ import type { Chamada } from '../motor/chamada'
 import type { GradeDaTabela } from '../motor/grade'
 import type { ErroSql } from '../motor/tipos'
 import { Editor } from './Editor'
+import { Escudo } from './fundos/Escudo'
 import { Carregando, Dicas, ErroDoJogo, Estrelas, Texto, Topo } from './Pecas'
 
 /** Com `ciclo`, esta tela é a segunda etapa do Ciclo completo: o ataque do jogador entra na bateria. */
@@ -73,8 +74,15 @@ export function TelaDefesa({ id, ciclo }: { id: string; ciclo?: { ataque: Chamad
     setRodando(false)
   }, [id])
 
+  // As brechas do escudo: o que a grade acusa agora, mais os testes de ataque que a última
+  // bateria reprovou, enquanto o SQL for o mesmo.
+  const naGrade = (grade ?? []).reduce((soma, g) => soma + g.divergencias, 0)
+  const naBateria = bateria && sqlDaBateria === sql ? bateria.testes.filter((x) => !x.ok && x.tipo === 'ataque').length : 0
+  const brechas = Math.max(naGrade, naBateria)
+
   return (
     <>
+      <Escudo brechas={brechas} selado={venceu} />
       <Topo faseId={id} titulo={fase.rotulo} modo={ciclo ? 'ciclo' : 'defesa'} estrelas={estrelas} etapa={ciclo && t('ciclo.etapaDefesa')} />
       <main className="fase">
         <div className="coluna">
