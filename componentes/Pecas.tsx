@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { rotaDe } from '../jogo/fases'
+import { ContaNoTopo } from './ContaNoTopo'
 import type { Modo } from '../jogo/progresso'
 import { t } from '../jogo/t'
 import { emBlocos, type Trecho } from '../jogo/texto'
@@ -33,7 +34,6 @@ export function Navegacao({ atual }: { atual?: 'fases' | 'diario' | 'laboratorio
     ['diario', '/diario/', t('nav.diario')],
     ['laboratorio', '/laboratorio/', t('nav.laboratorio')],
     ['ajuda', '/ajuda/', t('ajuda.titulo')],
-    ['perfil', '/perfil/', t('perfil.titulo')],
   ] as const
   return (
     <header className="topo">
@@ -46,6 +46,7 @@ export function Navegacao({ atual }: { atual?: 'fases' | 'diario' | 'laboratorio
           </Link>
         ))}
       </nav>
+      <ContaNoTopo />
     </header>
   )
 }
@@ -72,6 +73,7 @@ export function Topo({ faseId, titulo, modo, estrelas, etapa }: { faseId: string
           {t('modo.ciclo')}
         </Link>
       </nav>
+      <ContaNoTopo />
     </header>
   )
 }

@@ -1,13 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { conectar, nuvemConfigurada, vincularGoogle, type Conta } from '../jogo/conta'
 import { fases } from '../jogo/fases'
 import { hoje } from '../desafio/gerar'
 import { aoMudarProgresso, lerProgresso, patente, sequencia, totalDeEstrelas, type Modo, type Progresso } from '../jogo/progresso'
 import { t, type Chave } from '../jogo/t'
+import { Avatar } from './ContaNoTopo'
 import { Constelacao } from './fundos/Constelacao'
 import { Estrelas, Navegacao } from './Pecas'
+import { usarConta } from './usarConta'
 
 const MODOS: { modo: Modo; rotulo: Chave }[] = [
   { modo: 'ataque', rotulo: 'modo.ataque' },
@@ -17,13 +18,11 @@ const MODOS: { modo: Modo; rotulo: Chave }[] = [
 
 export function TelaPerfil() {
   const [progresso, setProgresso] = useState<Progresso>({})
-  const [conta, setConta] = useState<Conta | null>(null)
-  const [estado, setEstado] = useState<'parado' | 'vinculando'>('parado')
-  const [erro, setErro] = useState('')
+  const { conta, configurada, entrando, erro, entrar, sair } = usarConta()
+  const logado = conta !== null && !conta.anonima
 
   useEffect(() => {
     setProgresso(lerProgresso())
-    void conectar().then(setConta, () => {})
     return aoMudarProgresso(setProgresso)
   }, [])
 
@@ -31,18 +30,6 @@ export function TelaPerfil() {
   const estrelas = totalDeEstrelas(progresso)
   const maximo = fases.length * 9
   const dias = Object.keys(progresso).filter((id) => id.startsWith('diario-')).length
-
-  const vincular = async () => {
-    setEstado('vinculando')
-    setErro('')
-    try {
-      setConta(await vincularGoogle())
-    } catch (e) {
-      // Fechar a janela do Google não é erro para mostrar.
-      if ((e as { code?: string }).code !== 'auth/popup-closed-by-user') setErro((e as Error).message)
-    }
-    setEstado('parado')
-  }
 
   return (
     <>
@@ -75,25 +62,36 @@ export function TelaPerfil() {
           </div>
         </div>
 
-        <section className="cartao borda-completa" style={{ marginTop: 28 }}>
-          <h2>{t('perfil.conta')}</h2>
-          {!nuvemConfigurada && <p>{t('perfil.soNoNavegador')}</p>}
-          {nuvemConfigurada && !conta && <p className="fraco">{t('perfil.conectando')}</p>}
-          {conta?.anonima && (
-            <>
-              <p>{t('perfil.anonima')}</p>
-              <button className="botao borda-completa" onClick={vincular} disabled={estado === 'vinculando'}>
-                {estado === 'vinculando' ? t('perfil.vinculando') : t('perfil.salvarComGoogle')}
-              </button>
-            </>
-          )}
-          {conta && !conta.anonima && <p>{t('perfil.vinculada', { nome: conta.nome ?? 'Google' })}</p>}
-          {erro && (
-            <div className="aviso-erro" role="alert" style={{ marginTop: 12 }}>
-              <h3>{t('comum.erroDoJogo')}</h3>
-              <p>{erro}</p>
-            </div>
-          )}
+        <section className="cartao borda-completa conta-cartao" style={{ marginTop: 28 }}>
+          <Avatar conta={conta} tamanho={72} />
+          <div>
+            <h2>{t('perfil.conta')}</h2>
+            <h3>{logado ? (conta.nome ?? conta.email) : t('conta.anonimo')}</h3>
+            {logado && conta.nome && conta.email && <p className="email">{conta.email}</p>}
+            {logado && (
+              <>
+                <p>{t('perfil.vinculada')}</p>
+                <button className="botao-liso" onClick={sair} disabled={entrando}>
+                  {t('perfil.sair')}
+                </button>
+              </>
+            )}
+            {!logado && !configurada && <p>{t('perfil.soNoNavegador')}</p>}
+            {!logado && configurada && (
+              <>
+                <p>{t('perfil.anonima')}</p>
+                <button className="botao borda-completa" onClick={entrar} disabled={entrando || conta === null}>
+                  {entrando ? t('conta.entrando') : t('perfil.salvarComGoogle')}
+                </button>
+              </>
+            )}
+            {erro && (
+              <div className="aviso-erro" role="alert" style={{ marginTop: 12 }}>
+                <h3>{t('comum.erroDoJogo')}</h3>
+                <p>{erro}</p>
+              </div>
+            )}
+          </div>
         </section>
 
         <h2>{t('inicio.fases')}</h2>

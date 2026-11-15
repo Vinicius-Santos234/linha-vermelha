@@ -104,15 +104,69 @@ try {
   checar('5. e a fase seguinte volta a estar liberada', (await pagina.locator('.ilha.trancada').count()) === 9)
 
   await pagina.goto(`${origem}/perfil/`)
-  await pagina.getByRole('button', { name: 'Salvar progresso com Google' }).waitFor({ timeout: 15000 })
-  checar('6. o perfil mostra as estrelas e oferece o vínculo com o Google', await pagina.getByText('3 de 99 estrelas').isVisible())
+  await pagina.locator('.conta-cartao button').waitFor({ timeout: 15000 })
+  checar('6a. o perfil mostra as estrelas, "Anônimo" e o botão de entrar', (await pagina.getByText('3 de 99 estrelas').isVisible()) && (await pagina.locator('.conta-cartao h3').innerText()) === 'Anônimo' && (await pagina.locator('.conta-cartao button').innerText()) === 'Entrar com Google')
+
+  // Entrar com o Google sem sair da página: o botão do cabeçalho abre a janela do provedor.
+  // No emulador de Auth essa janela é uma tela de contas de teste.
+  await pagina.goto(`${origem}/fases/`)
+  await pagina.locator('.botao-entrar:not([disabled])').waitFor({ timeout: 15000 })
+  checar('6b. o cabeçalho mostra "Anônimo" e o botão de entrar', (await pagina.locator('.topo .conta-chip span').last().innerText()).trim() === 'Anônimo')
+  const [janela] = await Promise.all([alice.waitForEvent('page'), pagina.locator('.botao-entrar').click()])
+  await janela.waitForLoadState('domcontentloaded')
+  try {
+    await janela.getByText('Add new account').click({ timeout: 15000 })
+    await janela.getByText('Auto-generate user information').click()
+    await janela.locator('#display-name-input').fill('Alice de Teste').catch(() => {})
+    await janela.getByRole('button', { name: /Sign in with Google/ }).click()
+  } catch (e) {
+    console.log('JANELA DO EMULADOR:', (await janela.content().catch(() => '')).replace(/\s+/g, ' ').slice(0, 1500))
+    throw e
+  }
+  await pagina.locator('.botao-entrar').waitFor({ state: 'detached', timeout: 20000 })
+  const nomeNoTopo = (await pagina.locator('.topo .conta-chip span').last().innerText()).trim()
+  checar('6c. depois de entrar, o cabeçalho troca "Anônimo" pelo nome e o botão some', nomeNoTopo !== '' && nomeNoTopo !== 'Anônimo', nomeNoTopo)
+  const [vinculada] = await contas()
+  checar('6d. a conta é a mesma, agora ligada ao Google: o uid não mudou', (await contas()).length === 1 && vinculada.localId === conta.localId && vinculada.providerUserInfo?.[0]?.providerId === 'google.com', vinculada.localId)
+  checar('6e. o progresso continua lá', (await documentos()).length === 1 && (await documentos())[0].uid === conta.localId && (await estrelas(pagina)) === 3)
+  await pagina.goto(`${origem}/perfil/`)
+  await pagina.locator('.conta-cartao .email').waitFor({ timeout: 15000 })
+  const cartao = await pagina.locator('.conta-cartao').innerText()
+  checar('6f. o perfil mostra o nome, o e-mail e o avatar da conta, com o botão de sair', (await pagina.locator('.conta-cartao h3').innerText()) === nomeNoTopo && cartao.includes(vinculada.email) && (await pagina.locator('.conta-cartao .avatar:not(.anonimo)').count()) === 1 && (await pagina.locator('.conta-cartao button').allInnerTexts()).join() === 'Sair da conta', `${nomeNoTopo} · ${vinculada.email}`)
+  await pagina.screenshot({ path: join(raiz, 'provas/.saida/capturas/18-perfil-logado.png') })
+  await pagina.reload()
+  await pagina.locator('.conta-cartao .email').waitFor({ timeout: 15000 })
+  checar('6g. recarregada a página, a conta continua logada', (await pagina.locator('.topo .conta-chip span').last().innerText()).trim() === nomeNoTopo)
+
+  // Sair: o navegador volta ao começo, e o progresso fica guardado na conta.
+  await pagina.goto(`${origem}/fases/`)
+  await pagina.locator('.botao-sair').click()
+  await pagina.locator('.botao-entrar:not([disabled])').waitFor({ timeout: 20000 })
+  checar('6h. sair devolve o cabeçalho a "Anônimo", com o botão de entrar', (await pagina.locator('.topo .conta-chip span').last().innerText()).trim() === 'Anônimo' && (await pagina.locator('.botao-sair').count()) === 0)
+  checar('6i. o navegador volta ao começo: sem estrelas, só a fase 1 aberta', (await estrelas(pagina)) === 0 && (await pagina.locator('.ilha.trancada').count()) === 10)
+  const depoisDeSair = await documentos()
+  checar('6j. o progresso continua intacto na conta, e nenhum documento novo foi criado', depoisDeSair.length === 1 && depoisDeSair[0].uid === conta.localId && depoisDeSair[0].texto.includes('01-rls-desligado') && (await contas()).length === 2, `${(await contas()).length} contas, ${depoisDeSair.length} documento`)
+
+  // Entrar de novo com a mesma conta: é o caso da credencial que já está em uso.
+  const [denovo] = await Promise.all([alice.waitForEvent('page'), pagina.locator('.botao-entrar').click()])
+  await denovo.waitForLoadState('domcontentloaded')
+  try {
+    await denovo.getByText(vinculada.email).first().click({ timeout: 15000 })
+  } catch (e) {
+    console.log('JANELA DO EMULADOR:', (await denovo.content().catch(() => '')).replace(/\s+/g, ' ').slice(0, 1500))
+    throw e
+  }
+  await pagina.locator('.botao-sair').waitFor({ timeout: 20000 })
+  checar('6k. entrar de novo com a mesma conta traz o nome de volta', (await pagina.locator('.topo .conta-chip span').last().innerText()).trim() === nomeNoTopo)
+  checar('6l. e o progresso volta da nuvem', await ate(async () => (await estrelas(pagina)) === 3), `${await estrelas(pagina)} estrelas`)
+  const antesDoBruno = (await contas()).length
 
   // Outro jogador, em outro navegador: outra conta anônima, sem nada do primeiro.
   const bruno = await navegador.newContext()
   const outra = await bruno.newPage()
   await outra.goto(`${origem}/fases/`)
   await outra.getByRole('link', { name: 'Atacar' }).first().waitFor()
-  checar('7. outro navegador vira outro jogador, com outra conta', await ate(async () => (await contas()).length === 2), `${(await contas()).length} conta(s)`)
+  checar('7. outro navegador vira outro jogador, com outra conta, anônima', (await ate(async () => (await contas()).length === antesDoBruno + 1)) && (await outra.locator('.topo .conta-chip span').last().innerText()).trim() === 'Anônimo', `${(await contas()).length} conta(s)`)
   await new Promise((r) => setTimeout(r, 1500))
   checar('8. e não enxerga o progresso do primeiro', (await estrelas(outra)) === 0, `${await estrelas(outra)} estrelas`)
 

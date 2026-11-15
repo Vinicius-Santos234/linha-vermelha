@@ -813,3 +813,36 @@ table.dados tr.escondida td { color: #5f6368; text-decoration: line-through; tex
   .sumario ol { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
   .relogio { right: -40%; top: 10px; opacity: 0.4; }
 }
+
+/* ---------- A conta, no cabeçalho e no perfil ---------- */
+.conta-no-topo { position: relative; display: flex; align-items: center; gap: 8px; margin-left: 6px; }
+.conta-chip { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px 4px 4px; border-radius: 999px; border: 1px solid var(--borda); background: var(--superficie); font-size: 13.5px; font-weight: 600; color: #fff; max-width: 220px; }
+.conta-chip:hover { background: var(--superficie-2); }
+.conta-chip span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.avatar { flex: none; border-radius: 50%; object-fit: cover; display: grid; place-items: center; }
+.avatar.inicial { background: var(--completo); color: #fff; font-weight: 700; }
+.avatar.anonimo { background: var(--superficie-3); color: var(--texto-3); }
+.botao-entrar { --interior: var(--superficie); min-height: 36px; padding: 0 16px; border-radius: 999px; font: 600 13.5px var(--sans); color: #fff; cursor: pointer; white-space: nowrap; }
+.botao-entrar:hover { --interior: var(--superficie-2); box-shadow: 0 0 20px -6px var(--rosa); }
+.botao-entrar:disabled { opacity: 0.6; cursor: default; box-shadow: none; }
+.conta-erro { position: absolute; top: calc(100% + 10px); right: 0; z-index: 6; width: max-content; max-width: min(360px, 86vw); margin: 0; padding: 10px 14px; border-radius: 12px; background: #2a1a19; border: 1px solid rgba(242, 139, 130, 0.5); color: var(--erro); font-size: 13px; }
+
+.conta-cartao { display: flex; flex-wrap: wrap; align-items: center; gap: 18px 22px; }
+.conta-cartao > div { flex: 1 1 260px; min-width: 0; }
+.conta-cartao h3 { font-size: 24px; color: #fff; letter-spacing: -0.02em; margin-bottom: 4px; overflow-wrap: anywhere; }
+.conta-cartao .email { font: 13.5px var(--mono); color: var(--texto-3); margin-bottom: 10px; overflow-wrap: anywhere; }
+.conta-cartao .botao { margin-top: 6px; }
+
+@media (max-width: 860px) {
+  .conta-chip { max-width: 150px; }
+}
+.conta-cartao h2 { margin: 0 0 6px; }
+@media (max-width: 860px) {
+  /* No celular a conta sobe para a primeira linha, ao lado da marca, e o menu desce inteiro. */
+  .topo .menu { order: 3; flex-basis: 100%; }
+}
+
+.botao-sair { min-height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--borda); background: transparent; color: var(--texto-3); font: 600 13px var(--sans); cursor: pointer; white-space: nowrap; }
+.botao-sair:hover { color: #fff; background: var(--superficie-2); }
+.botao-sair:disabled { opacity: 0.5; cursor: default; }
+.conta-cartao .botao-liso { margin-top: 4px; }

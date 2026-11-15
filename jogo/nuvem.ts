@@ -10,6 +10,7 @@ import {
   onAuthStateChanged,
   signInAnonymously,
   signInWithCredential,
+  signOut,
   type User,
 } from 'firebase/auth'
 import { connectFirestoreEmulator, doc, getDoc, initializeFirestore, persistentLocalCache, serverTimestamp, setDoc } from 'firebase/firestore'
@@ -19,6 +20,8 @@ export interface Conta {
   uid: string
   anonima: boolean
   nome: string | null
+  email: string | null
+  foto: string | null
 }
 
 // A chave de API do Firebase é pública por design: quem protege os dados são as Rules.
@@ -37,7 +40,18 @@ if (process.env.NEXT_PUBLIC_FIREBASE_EMULADORES) {
   connectFirestoreEmulator(db, '127.0.0.1', 8080)
 }
 
-const contaDe = (usuario: User): Conta => ({ uid: usuario.uid, anonima: usuario.isAnonymous, nome: usuario.displayName ?? usuario.email })
+// Quando uma conta anônima é vinculada ao Google, o Firebase não copia o nome e a foto
+// para o usuário: eles ficam nos dados do provedor. Por isso os dois lugares são lidos.
+function contaDe(usuario: User): Conta {
+  const google = usuario.providerData.find((p) => p.providerId === 'google.com') ?? usuario.providerData[0]
+  return {
+    uid: usuario.uid,
+    anonima: usuario.isAnonymous,
+    nome: usuario.displayName ?? google?.displayName ?? null,
+    email: usuario.email ?? google?.email ?? null,
+    foto: usuario.photoURL ?? google?.photoURL ?? null,
+  }
+}
 const documento = () => doc(db, 'progresso', auth.currentUser!.uid)
 
 async function enviar(progresso: Progresso): Promise<void> {
@@ -65,11 +79,29 @@ export function conectar(): Promise<Conta> {
       })
     })
     const usuario = lembrado ?? (await signInAnonymously(auth)).user
-    ligarNuvem((progresso) => void enviar(progresso).catch(() => {}))
+    ligarNuvem(aoVencer)
     // Sem rede, o jogo segue com o que está no navegador e sincroniza na próxima visita.
     await sincronizar().catch(() => {})
     return contaDe(usuario)
   })())
+}
+
+const aoVencer = (progresso: Progresso) => void enviar(progresso).catch(() => {})
+
+/**
+ * Sair da conta Google. O progresso é da conta e continua salvo nela, então este navegador
+ * volta ao começo: uma conta anônima nova, sem estrelas. Entrar de novo traz tudo de volta.
+ */
+export async function sair(): Promise<Conta> {
+  await conectar()
+  // Nada pode ser enviado enquanto a conta troca: o progresso zerado não é da conta que sai.
+  ligarNuvem(null)
+  await signOut(auth)
+  gravarProgresso({})
+  const { user } = await signInAnonymously(auth)
+  ligarNuvem(aoVencer)
+  conexao = Promise.resolve(contaDe(user))
+  return conexao
 }
 
 /**
