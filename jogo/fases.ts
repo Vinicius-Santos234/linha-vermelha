@@ -3,6 +3,9 @@ import { pacotes } from './fases.gerado'
 import type { Progresso } from './progresso'
 import { lerTexto, type TextoDaFase } from './texto'
 
+/** Quantas fases o catálogo completo prevê. As que ainda não existem aparecem como "a caminho". */
+export const TOTAL_DO_CATALOGO = 13
+
 export interface FaseDaTela {
   id: string
   nivel: number

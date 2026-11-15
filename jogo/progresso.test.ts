@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { estrelasPara, mesclar, type Conquista } from './progresso'
+import { estrelasPara, mesclar, patente, totalDeEstrelas, type Conquista } from './progresso'
 
 const c = (estrelas: number, quando = '2026-11-15T00:00:00.000Z'): Conquista => ({ estrelas, dicas: 3 - estrelas, concluidaEm: quando })
 
@@ -20,6 +20,17 @@ describe('progresso', () => {
     const antiga = { f1: { ataque: c(3, '2026-11-01T00:00:00.000Z') } }
     const nova = { f1: { ataque: c(3, '2026-11-15T00:00:00.000Z') } }
     expect(mesclar(antiga, nova)).toEqual(antiga)
+  })
+
+  it('soma as estrelas de todas as fases e modos', () => {
+    expect(totalDeEstrelas({})).toBe(0)
+    expect(totalDeEstrelas({ f1: { ataque: c(3), defesa: c(1) }, f4: { ciclo: c(2) } })).toBe(6)
+  })
+
+  it('a patente sobe com as estrelas, e a última só vem com todas', () => {
+    expect([0, 1, 8, 9, 17, 18, 26, 27].map((n) => patente(n, 27))).toEqual([
+      'patente.0', 'patente.1', 'patente.1', 'patente.2', 'patente.2', 'patente.3', 'patente.3', 'patente.4',
+    ])
   })
 
   it('mesclar com vazio não muda nada', () => {

@@ -60,7 +60,10 @@ try {
   // 1. O início.
   await pagina.goto(`${origem}/`)
   await pagina.getByRole('link', { name: /Começar a jogar/ }).waitFor()
-  await quadro(2.2, 'inicio.png')
+  await pagina.locator('.cena.borda-quente .selo.visivel').waitFor({ timeout: 30000 })
+  await quadro(2.4, 'inicio.png')
+  await pagina.locator('.cena.borda-fria .selo.visivel').waitFor({ timeout: 30000 })
+  await quadro(2.4)
 
   // 2. Ataque: o briefing, o código e a vitória.
   await pagina.goto(`${origem}/fase/01-rls-desligado/ataque/`)

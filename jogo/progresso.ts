@@ -18,6 +18,18 @@ export function estrelasPara(dicasAbertas: number): number {
   return Math.max(1, 3 - dicasAbertas)
 }
 
+export function totalDeEstrelas(progresso: Progresso): number {
+  return Object.values(progresso).reduce((soma, modos) => soma + Object.values(modos).reduce((s, c) => s + (c?.estrelas ?? 0), 0), 0)
+}
+
+/** O título do jogador, pela fração das estrelas que ele já tem. */
+export function patente(estrelas: number, maximo: number): 'patente.0' | 'patente.1' | 'patente.2' | 'patente.3' | 'patente.4' {
+  if (estrelas <= 0) return 'patente.0'
+  if (estrelas >= maximo) return 'patente.4'
+  const fracao = estrelas / maximo
+  return fracao < 1 / 3 ? 'patente.1' : fracao < 2 / 3 ? 'patente.2' : 'patente.3'
+}
+
 /**
  * Junta dois progressos ficando com o máximo de estrelas por fase e modo. É o que
  * acontece quando quem jogou em dois aparelhos vincula os dois à mesma conta.

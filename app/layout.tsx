@@ -7,6 +7,7 @@ import './globals.css'
 export const metadata: Metadata = {
   title: `${t('marca.nome')} · ${t('marca.sigla')}`,
   description: t('marca.frase'),
+  openGraph: { title: t('marca.nome'), description: t('marca.frase'), type: 'website', locale: 'pt_BR' },
 }
 
 export const viewport: Viewport = { themeColor: '#131314' }

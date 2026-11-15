@@ -11,17 +11,21 @@
   <img src="https://img.shields.io/badge/idioma-PT--BR-fdc830?style=flat-square" alt="Idioma: PT-BR">
 </p>
 
-<h3 align="center">Primeiro você entra pela falha. Depois você a fecha, sem quebrar o app.</h3>
+<h3 align="center">Invada o app. Conserte a falha. Não quebre nada.</h3>
+
+<p align="center">
+  <a href="https://linha-vermelha.vercel.app"><b>▶ Jogar agora: linha-vermelha.vercel.app</b></a>
+</p>
 
 **Linha Vermelha** é um jogo de segurança que roda inteiro no navegador. Cada fase é um app de mentira, feito com Supabase, com uma falha de **Row Level Security** de verdade. Você ataca com o mesmo cliente `supabase` que qualquer visitante do site teria, e depois conserta as políticas em SQL.
 
 Não tem servidor do jogo, não tem banco de terceiros e não tem flag para copiar de um passo a passo: o Postgres roda dentro da sua aba, e é o motor que vê a linha proibida passar na resposta.
 
 <p align="center">
-  <img src="docs/demo.gif" alt="O jogo rodando: o início, o ataque à fase 1, a defesa com a grade em vermelho, o conserto e o laboratório" width="100%">
+  <img src="docs/demo.gif" alt="O jogo rodando: a abertura com a cena animada, o ataque à fase 1, a defesa com a grade em vermelho, o conserto e o laboratório" width="100%">
 </p>
 
-> **Estado:** a v1 roda inteira na máquina, com três fases e quatro modos. Ainda não está publicada num endereço: para jogar, é clonar e rodar. O que falta está em [Roteiro](#roteiro).
+> **Estado:** a v1 está no ar em [linha-vermelha.vercel.app](https://linha-vermelha.vercel.app), com três fases e quatro modos. O que vem depois está em [Roteiro](#roteiro).
 
 ## Por que existe
 
@@ -70,16 +74,19 @@ A interface parte do tema escuro dos consoles de nuvem (a referência foi o cons
 </p>
 
 - **A cor diz em que modo você está.** O gradiente quente (vermelho, laranja, amarelo) é do Ataque. O frio (azul, roxo, rosa) é da Defesa. O completo, que vai de um ao outro, é do Ciclo e dos títulos.
-- **Gradiente na borda e no texto, nunca no preenchimento.** Os cartões e botões são escuros por dentro, e só o contorno carrega a cor. O conteúdo continua legível, e a tela não vira um carnaval.
+- **Gradiente na borda e no texto, quase nunca no preenchimento.** Os cartões e botões são escuros por dentro, e só o contorno carrega a cor. O conteúdo continua legível, e a tela não vira um carnaval. As exceções são de propósito: o botão **Jogar** da abertura e os carimbos de vitória, que são as únicas coisas da tela pedindo para serem vistas primeiro.
+- **A abertura mostra o jogo em vez de descrevê-lo.** Um console se digita sozinho, traz o pedido que não devia, carimba "Você cruzou a linha", vira para a Defesa e fecha a grade. Quem chega entende a proposta em dez segundos, sem ler.
+- **A linha vermelha é a trilha de progresso.** As fases são pontos numa linha que acende até onde você chegou. Os pontos trancados e os que ainda vêm ficam apagados, à frente.
+- **Patente e estrelas.** O progresso aparece como num jogo: uma barra, um total de estrelas e um título que sobe de Visitante a Lenda da linha.
 - **Botões em pílula.** A ação principal tem borda em gradiente e brilha de leve ao passar o mouse. A secundária tem borda cinza.
 - **Vermelho com um significado só.** Na grade "quem vê o quê", vermelho quer dizer que a política diverge do que deveria ser. Ele não aparece como enfeite em nenhum outro lugar da Defesa.
 - **Código em primeiro plano.** Editor [CodeMirror 6](https://codemirror.net) com tema próprio, na mesma paleta, e fonte monoespaçada em tudo o que é dado: schema, respostas, grade e testes.
 - **Sem biblioteca de estilo.** É CSS puro com variáveis, num arquivo só (`app/globals.css`). As fontes são as do sistema: nada é baixado para desenhar a tela.
 - **Do celular ao monitor largo.** A 390 px a página não rola para o lado, e isso é conferido pela prova do site.
-- **Respeita `prefers-reduced-motion`**, e a grade descreve cada célula em texto para leitor de tela.
+- **Respeita `prefers-reduced-motion`:** sem movimento, a cena da abertura fica parada no vazamento. A grade descreve cada célula em texto para leitor de tela, e a cena tem uma descrição escrita.
 
 <p align="center">
-  <img src="docs/inicio.png" alt="A tela inicial: continuar de onde parou ou escolher um modo" width="49%">
+  <img src="docs/inicio.png" alt="A abertura: o logotipo com a linha acesa, o botão de jogar e a cena do ataque" width="49%">
   <img src="docs/laboratorio.png" alt="O laboratório: as linhas que o usuário escolhido não enxerga aparecem apagadas" width="49%">
 </p>
 
@@ -197,7 +204,8 @@ Os testes não deixam uma fase impossível ou com o gabarito errado ir adiante: 
 
 ## Roteiro
 
-- [ ] Publicar com domínio próprio
+- [x] Publicar: [linha-vermelha.vercel.app](https://linha-vermelha.vercel.app)
+- [ ] Domínio próprio
 - [ ] Teste com jogadores de verdade, para calibrar as dicas
 - [ ] As fases 2, 3 e 6 a 11, uma por vez: política provisória, linhas órfãs, convite que ninguém confere, view que ignora RLS, função que confia no parâmetro e outras
 - [ ] Nível 4, com console SQL: o dono que não obedece ao RLS e o sequestro de `search_path`
