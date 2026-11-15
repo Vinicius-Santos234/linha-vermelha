@@ -77,6 +77,14 @@ Cada fase vale três estrelas em cada modo. Cada dica aberta custa uma, e o mín
 
 Vencer uma fase em qualquer modo libera a seguinte.
 
+## Desafio diário
+
+Todo dia há uma fase nova, sorteada pela data: uma falha, um app e um alvo diferentes. É a mesma para todo mundo e troca à meia-noite, no seu horário. Dias seguidos contam como sequência, e as estrelas do desafio não entram no total da campanha.
+
+## Fases em que a linha nunca aparece
+
+Numa fase de **descobrir**, o RLS está certo e nenhuma consulta devolve a linha-alvo. O banco deixa escapar a informação de outro jeito, e você a informa na caixa "Sua resposta".
+
 ## Onde isso tudo roda
 
 No seu navegador. O banco é um Postgres de verdade (PGlite) que existe só na sua aba, e o seu código roda isolado dele. Nenhum banco de terceiros é tocado.

@@ -1,0 +1,135 @@
+{
+  "cenarios": [
+    {
+      "id": "padaria", "app": "Padaria do Zé", "tabela": "pedidos", "um": "o pedido", "varios": "os pedidos", "colunas": ["itens", "endereco"],
+      "linhas": [["6 pães franceses", "Rua das Acácias, 12"], ["1 bolo de fubá", "Rua do Lago, 88"], ["2 sonhos de creme", "Av. Central, 400"], ["1 pão de centeio", "Praça da Matriz, 5"], ["12 pães de queijo", "Rua Sete, 71"], ["1 torta de maçã", "Travessa das Flores, 9"]],
+      "segredos": [["1 torta de limão (surpresa de aniversário)", "entregar escondido, pelos fundos"], ["1 bolo com o recado: \"Quer casar comigo?\"", "não avisar ninguém da casa"]]
+    },
+    {
+      "id": "clinica", "app": "Clínica Vida", "tabela": "consultas", "um": "a consulta", "varios": "as consultas", "colunas": ["especialidade", "observacao"],
+      "linhas": [["Clínico geral", "retorno em seis meses"], ["Oftalmologia", "trocar o grau dos óculos"], ["Dermatologia", "usar protetor todo dia"], ["Ortopedia", "fisioterapia duas vezes por semana"], ["Nutrição", "diário alimentar por 15 dias"], ["Cardiologia", "teste de esforço marcado"]],
+      "segredos": [["Psiquiatria", "paciente pediu sigilo total, nem a família sabe"], ["Obstetrícia", "gravidez ainda não contada a ninguém"]]
+    },
+    {
+      "id": "academia", "app": "Academia Ferro & Fôlego", "tabela": "fichas", "um": "a ficha", "varios": "as fichas", "colunas": ["objetivo", "observacao"],
+      "linhas": [["Hipertrofia", "treino A/B, quatro vezes por semana"], ["Corrida de 10 km", "prova em março"], ["Mobilidade", "alongar antes do trabalho"], ["Emagrecimento", "aeróbico em jejum"], ["Natação", "três mil metros por semana"], ["Força", "agachamento com 80 kg"]],
+      "segredos": [["Recuperação do joelho", "cirurgia em janeiro; não contar para o time"], ["Preparação para concurso de bombeiro", "o chefe atual não pode saber"]]
+    },
+    {
+      "id": "escola", "app": "Colégio Horizonte", "tabela": "boletins", "um": "o boletim", "varios": "os boletins", "colunas": ["disciplina", "comentario"],
+      "linhas": [["Matemática", "nota 8,5; participa bem"], ["Português", "nota 9,0; lê muito"], ["História", "nota 7,0; entregar o trabalho"], ["Ciências", "nota 8,0; ótimo no laboratório"], ["Geografia", "nota 7,5; estudar mapas"], ["Inglês", "nota 9,5; conversação excelente"]],
+      "segredos": [["Física", "nota 2,0; recuperação, os pais ainda não foram avisados"], ["Química", "suspeita de cola na prova; caso em apuração"]]
+    },
+    {
+      "id": "oficina", "app": "Oficina do Tonho", "tabela": "orcamentos", "um": "o orçamento", "varios": "os orçamentos", "colunas": ["servico", "veiculo"],
+      "linhas": [["Troca de óleo", "hatch prata 2015"], ["Alinhamento e balanceamento", "sedã preto 2019"], ["Pastilhas de freio", "picape branca 2012"], ["Revisão dos 40 mil", "SUV cinza 2021"], ["Troca da correia", "hatch vermelho 2010"], ["Ar-condicionado", "sedã azul 2017"]],
+      "segredos": [["Funilaria completa depois de batida", "o dono não quer que a seguradora saiba"], ["Instalação de rastreador escondido", "carro da esposa; ela não sabe"]]
+    },
+    {
+      "id": "petshop", "app": "Pet Shop Bicho Bom", "tabela": "agendamentos", "um": "o agendamento", "varios": "os agendamentos", "colunas": ["servico", "pet"],
+      "linhas": [["Banho e tosa", "Thor, golden"], ["Vacina anual", "Mimi, gata siamesa"], ["Corte de unhas", "Bolinha, poodle"], ["Consulta de rotina", "Nina, vira-lata"], ["Banho", "Fred, bulldog"], ["Hidratação", "Luna, shih-tzu"]],
+      "segredos": [["Hospedagem por 10 dias", "a casa vai ficar vazia de 20 a 30; não divulgar"], ["Adestramento", "o cachorro mordeu um vizinho; assunto delicado"]]
+    },
+    {
+      "id": "biblioteca", "app": "Biblioteca do Bairro", "tabela": "emprestimos", "um": "o empréstimo", "varios": "os empréstimos", "colunas": ["livro", "anotacao"],
+      "linhas": [["Dom Casmurro", "devolver até dia 10"], ["O Cortiço", "renovado uma vez"], ["Vidas Secas", "capa com avaria"], ["A Hora da Estrela", "reservado depois"], ["Capitães da Areia", "devolver até dia 22"], ["Grande Sertão: Veredas", "empréstimo longo"]],
+      "segredos": [["Como pedir demissão sem queimar pontes", "leitor pediu discrição"], ["Guia do divórcio amigável", "não comentar no balcão"]]
+    },
+    {
+      "id": "hotel", "app": "Pousada Mar Aberto", "tabela": "reservas", "um": "a reserva", "varios": "as reservas", "colunas": ["quarto", "pedido"],
+      "linhas": [["Standard, 2 noites", "berço no quarto"], ["Luxo, 3 noites", "vista para o mar"], ["Standard, 1 noite", "check-in tarde"], ["Família, 5 noites", "duas camas extras"], ["Luxo, 2 noites", "café no quarto"], ["Standard, 4 noites", "andar baixo"]],
+      "segredos": [["Suíte master, 2 noites", "viagem surpresa de bodas; a esposa não pode saber"], ["Luxo, 1 noite", "hóspede famoso; não registrar o nome na recepção"]]
+    }
+  ],
+  "geral": {
+    "titulo": "Desafio de {dia}",
+    "resumo": "{app}: uma falha nova, igual para todo mundo, só hoje.",
+    "alvoDoBruno": "{Um} #{id} é do Bruno, e não era para mais ninguém ver.",
+    "alvoDeVisitante": "{Um} #{id} é de uma pessoa sem conta, e não era para ninguém ver pelo app.",
+    "objetivo": "**Objetivo:** fazer {um} #{id} aparecer numa resposta do seu console.",
+    "voce": "Você é a Alice, com uma conta comum no app **{app}**.",
+    "defesa": "Conserte **sem quebrar o app**: {regra}",
+    "dica2": "Esta dica revela as políticas.",
+    "dica3Ataque": "O ataque inteiro:",
+    "dica3Defesa": "O conserto de referência:",
+    "regraDono": "cada pessoa continua vendo, alterando e apagando só o que é seu."
+  },
+  "familias": {
+    "rls-desligado": {
+      "contexto": "O app **{app}** foi ao ar às pressas. {Varios} ficam numa tabela só, e ninguém parou para olhar a segurança dela.",
+      "ataque1": "Comece pelo mais simples: ler a tabela `{tabela}`. Você precisa mesmo estar logada?",
+      "ataque2": "Repare no que **não** está lá. Uma tabela com o RLS desligado não filtra linha nenhuma.",
+      "defesa0": "A tabela `{tabela}` nunca teve o RLS ligado.",
+      "defesa1": "São duas coisas: ligar o RLS e dizer quem pode o quê. Só ligar tranca todo mundo para fora, inclusive os donos.",
+      "defesa2": "A política compara a coluna `user_id` com quem está chamando, que é `auth.uid()`.",
+      "explicacao": "Com o RLS desligado o Postgres não filtra nada, e os privilégios padrão do Supabase deixam a chave pública ler e gravar a tabela inteira. O conserto tem duas metades: `ENABLE ROW LEVEL SECURITY` passa a negar tudo, e a política devolve a cada pessoa só o que é dela."
+    },
+    "politica-provisoria": {
+      "contexto": "O app **{app}** tem o RLS ligado em `{tabela}`. Sem login, a tabela não devolve nada.",
+      "ataque1": "RLS ligado não quer dizer RLS certo. O que muda quando você faz login antes de consultar?",
+      "ataque2": "Leia a condição do `USING`. Ela compara alguma coisa com quem está chamando?",
+      "defesa0": "O RLS está ligado, e mesmo assim toda conta lê tudo.",
+      "defesa1": "O problema é uma palavra só: `true`. Uma condição sempre verdadeira não filtra nada.",
+      "defesa2": "Troque o `true` por uma comparação entre `user_id` e `auth.uid()`, no `USING` e no `WITH CHECK`.",
+      "explicacao": "`USING (true)` é a política que se escreve para o protótipo funcionar, com a promessa de voltar depois. O efeito é o do RLS desligado para qualquer pessoa logada, e criar uma conta costuma ser grátis."
+    },
+    "linhas-orfas": {
+      "contexto": "O app **{app}** também registra {varios} de quem não tem conta. Essas linhas ficam com o `user_id` vazio, e a política ganhou um remendo para elas.",
+      "ataque1": "Procure as linhas que não são de ninguém. O cliente tem um filtro para valor vazio: `.is('coluna', null)`.",
+      "ataque2": "Repare no `OR`. Agora pense no que `auth.uid()` devolve para quem não fez login.",
+      "defesa0": "As linhas sem dono estão vazando.",
+      "defesa1": "O `OR user_id IS NULL` foi posto para as linhas sem dono \"funcionarem\". Para quem elas precisam funcionar?",
+      "defesa2": "Tire o `OR`. Linha sem dono fica invisível para a API, que é o certo: quem cuida dela é o servidor.",
+      "explicacao": "A política não sabe a diferença entre \"sem dono\" e \"de todo mundo\". Com o `OR user_id IS NULL`, a condição ficou verdadeira para qualquer pessoa, logada ou não. O que não tem dono é responsabilidade do servidor."
+    },
+    "metadata-do-usuario": {
+      "contexto": "No app **{app}**, quem é gerente vê {varios} de todo mundo. O papel de cada pessoa viaja no token de login.",
+      "ataque1": "O token carrega dois blocos sobre você: `user_metadata` e `app_metadata`. Um deles é seu para editar. Veja com `supabase.auth.getUser()`.",
+      "ataque2": "Veja de onde a política do gerente lê o papel, e lembre de `supabase.auth.updateUser`.",
+      "defesa0": "A política lê o papel da parte errada do token.",
+      "defesa1": "Só uma palavra da política precisa mudar. Qual dos dois blocos do token o usuário **não** consegue alterar?",
+      "defesa2": "O `app_metadata` só o servidor escreve, e a Carla já tem o papel de gerente lá.",
+      "explicacao": "O `user_metadata` existe para o usuário guardar o que quiser, e ele mesmo o altera com `auth.updateUser`. Uma política que lê permissão dali está perguntando ao visitante se ele é gerente. Permissão vem do `app_metadata`, que só o servidor escreve."
+    },
+    "politicas-que-somam": {
+      "contexto": "O app **{app}** reforçou a segurança: {varios} só aparecem para conta com verificação em duas etapas. A equipe acrescentou uma política nova, ao lado da política por dono.",
+      "ataque1": "Não precisa de truque. A sua conta é verificada: entre com ela e leia a tabela inteira.",
+      "ataque2": "São duas políticas, e as duas são permissivas. O Postgres exige que **todas** passem, ou que **alguma** passe?",
+      "defesa0": "As duas políticas estão certas sozinhas. O problema é como o Postgres junta as duas.",
+      "defesa1": "A segunda política foi escrita para restringir. Há uma palavra no `CREATE POLICY` que diz isso ao Postgres.",
+      "defesa2": "`AS RESTRICTIVE`. Uma política restritiva tem de passar **junto** com alguma permissiva.",
+      "explicacao": "Políticas permissivas se combinam com **OU**: acrescentar uma nunca tira acesso de ninguém. A equipe quis dizer \"dono **e** verificado\" e escreveu \"dono **ou** verificado\". Para restringir, a política precisa ser `AS RESTRICTIVE`.",
+      "regra": "cada pessoa vê só o que é seu, e só se a conta for verificada. A Carla ainda não é: nada dela pode aparecer, nem para ela."
+    },
+    "coluna-sem-vigia": {
+      "contexto": "No app **{app}** cada pessoa tem um perfil, e quem é admin vê {varios} de todo mundo.",
+      "ataque1": "A tabela `{tabela}` está bem protegida. Olhe para `perfis`, e para o que você pode **alterar** nela.",
+      "ataque2": "A política de UPDATE em `perfis` confere **de quem é a linha**. Ela diz algo sobre **quais colunas** podem mudar?",
+      "defesa0": "As políticas estão quase certas, e é por isso que ninguém viu.",
+      "defesa1": "RLS decide quais **linhas** cada pessoa alcança. Não fala de **colunas**. Procure o mecanismo do Postgres que fala.",
+      "defesa2": "Tire da API o direito de alterar a tabela inteira e devolva só a coluna que o cliente precisa: `revoke` e `grant ... (coluna)`.",
+      "explicacao": "A política de UPDATE dizia, corretamente, que cada pessoa só mexe na própria linha de `perfis`. Só que a coluna `is_admin` mora nessa linha, e nada dizia que ela não podia mudar. Quem decide colunas é o grant.",
+      "regra": "cada pessoa continua vendo o que é seu e trocando o próprio nome no perfil, e a Carla, que é admin, continua vendo tudo."
+    },
+    "view-que-ignora-rls": {
+      "contexto": "No app **{app}**, a tabela `{tabela}` está protegida como manda o figurino. Para a tela inicial, alguém criou um resumo em cima dela.",
+      "ataque1": "Olhe o schema: há mais de uma coisa para consultar. O cliente lê uma view do mesmo jeito que lê uma tabela.",
+      "ataque2": "Repare no que **não** aparece na definição da view: nenhuma opção dizendo com as permissões de quem ela roda.",
+      "defesa0": "As políticas da tabela estão certas. O vazamento vem da view.",
+      "defesa1": "Por padrão, uma view consulta as tabelas com as permissões de quem a criou. O RLS que vale é o do criador.",
+      "defesa2": "Desde o Postgres 15 existe uma opção de view para inverter isso: `security_invoker`.",
+      "explicacao": "RLS se aplica a quem consulta a tabela. Quando a consulta passa por uma view comum, quem consulta é o dono da view, e para ele as políticas não valem. Com `security_invoker = true`, a view passa a consultar com as permissões de quem a chamou.",
+      "regra": "o resumo continua existindo e mostra a cada pessoa só o que é seu."
+    },
+    "funcao-que-confia-no-parametro": {
+      "contexto": "No app **{app}**, a tabela `{tabela}` está bem protegida. Para montar o histórico de cada pessoa, a equipe escreveu uma função, chamada pelo app com `supabase.rpc`.",
+      "ataque1": "O schema mostra uma função além das tabelas. Ela recebe um argumento. Quem escolhe o valor dele?",
+      "ataque2": "Repare em `SECURITY DEFINER`, e em de onde vem o `uid` do `WHERE`. Para achar o id de outra pessoa, procure uma tabela pública que o mostre.",
+      "defesa0": "As políticas estão certas. O furo é a função, que passa por cima delas.",
+      "defesa1": "`SECURITY DEFINER` faz a função rodar com as permissões de quem a criou. Dentro dela, o RLS de quem chamou não vale.",
+      "defesa2": "Dois caminhos: a função usar `auth.uid()` em vez do argumento, ou virar `SECURITY INVOKER`.",
+      "explicacao": "Uma função `SECURITY DEFINER` é uma porta que abre com a chave do dono. Esta recebia um id e devolvia as linhas dele, sem conferir quem chamava. Argumento vindo do cliente nunca decide **de quem** são os dados: isso vem de `auth.uid()`.",
+      "regra": "a função continua existindo, e cada pessoa continua vendo o próprio histórico por ela."
+    }
+  }
+}

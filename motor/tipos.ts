@@ -1,3 +1,5 @@
+import type { Chamada } from './chamada'
+
 export type Linha = Record<string, unknown>
 
 /** Quem faz a chamada, do ponto de vista da regra de negócio. */
@@ -32,9 +34,27 @@ export interface RegraTabela {
 
 export type Objetivo =
   /** Vence quando a linha-alvo aparece numa resposta devolvida ao jogador. */
-  | { tipo: 'ler'; tabela: string; id: string | number }
+  | {
+      tipo: 'ler'
+      tabela: string
+      id: string | number
+      /** Outros caminhos que também entregam a linha: uma view ou uma função (rpc). */
+      tambemPor?: string[]
+    }
   /** Vence quando a linha-alvo fica com `campo = valor` no banco. */
   | { tipo: 'alterar'; tabela: string; id: string | number; campo: string; valor: string | number | boolean | null }
+  /** Vence quando o jogador informa um valor que o RLS esconde, mas que o banco deixa deduzir. */
+  | { tipo: 'descobrir'; tabela: string; resposta: string }
+
+/** Algo que o app precisa continuar fazendo depois do conserto. A bateria confere. */
+export interface UsoLegitimo {
+  nome: string
+  /** Nome de um usuário da fase, ou 'anon'. */
+  como: string
+  chamada: Chamada
+  /** 'linhas': além de não dar erro, a chamada tem de devolver alguma linha. */
+  espera?: 'sucesso' | 'linhas'
+}
 
 export interface DefinicaoFase {
   id: string
@@ -47,6 +67,8 @@ export interface DefinicaoFase {
   objetivo: Objetivo
   /** O gabarito: regra de negócio por tabela, independente das políticas (D10). */
   gabarito: Record<string, Regra | RegraTabela>
+  /** Usos legítimos que a grade não cobre (inserir, chamar função). */
+  usos?: UsoLegitimo[]
 }
 
 /** A definição mais o SQL que monta a fase. O motor não lê arquivo: quem chama entrega o texto. */

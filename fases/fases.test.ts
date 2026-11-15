@@ -20,7 +20,7 @@ async function gravarAtaque(f: FaseComReferencia): Promise<{ venceu: boolean; ch
   const sessao = await abrirFase(base, f, { sessao: 'jogador' })
   try {
     const partida = new Partida(sessao)
-    await f.ataque!(criarSupabase((c) => partida.chamar(c)))
+    await f.ataque!(criarSupabase((c) => partida.chamar(c)), async (valor) => void (await partida.chamar({ tipo: 'resposta', valor })))
     return { venceu: partida.venceu, chamadas: partida.historico }
   } finally {
     await sessao.fechar()

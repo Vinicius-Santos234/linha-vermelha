@@ -1,7 +1,8 @@
 import { t, type Chave } from '../mensagens/t'
 import type { Chamada } from './chamada'
 import { montarGrade } from './grade'
-import { reproduzirAtaque } from './partida'
+import { Partida, reproduzirAtaque } from './partida'
+import type { RespostaCliente } from './chamada'
 import { ident, tabelaPublica } from './sql'
 import { abrirFase, ErroNoSqlDoJogador, type Sessao, type Snapshot } from './sessao'
 import { regraDe, type ErroSql, type Fase, type Regra } from './tipos'
@@ -118,7 +119,25 @@ export async function rodarBateria(sessao: Sessao, ataques: AtaqueNomeado[] = []
     }
   }
 
-  // 4. Os ataques conhecidos: o de referência e, no Ciclo completo, o do próprio jogador.
+  // 4. O que o app precisa continuar fazendo e a grade não cobre: inserir, chamar função.
+  for (const uso of sessao.fase.def.usos ?? []) {
+    const r = (await sessao.db.transaction(async (tx) => {
+      const partida = new Partida(sessao, tx)
+      partida.usuario = sessao.usuario(uso.como)
+      const resposta = await partida.chamar(uso.chamada)
+      await tx.rollback()
+      return resposta
+    })) as RespostaCliente
+    const vazio = uso.espera === 'linhas' && !(Array.isArray(r.data) && r.data.length > 0)
+    testes.push({
+      tipo: 'uso',
+      nome: uso.nome,
+      ok: !r.error && !vazio,
+      detalhe: r.error ? r.error.message : vazio ? t('bateria.uso.vazio') : t('bateria.uso.ok'),
+    })
+  }
+
+  // 5. Os ataques conhecidos: o de referência e, no Ciclo completo, o do próprio jogador.
   for (const ataque of ataques) {
     const venceu = await reproduzirAtaque(sessao, ataque.chamadas)
     testes.push({

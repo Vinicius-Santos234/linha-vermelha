@@ -25,7 +25,7 @@ Não tem servidor do jogo, não tem banco de terceiros e não tem flag para copi
   <img src="docs/demo.gif" alt="O jogo rodando: a abertura com a cena animada, o ataque à fase 1, a defesa com a grade em vermelho, o conserto e o laboratório" width="100%">
 </p>
 
-> **Estado:** a v1 está no ar em [linha-vermelha.vercel.app](https://linha-vermelha.vercel.app), com três fases e quatro modos. O que vem depois está em [Roteiro](#roteiro).
+> **Estado:** no ar em [linha-vermelha.vercel.app](https://linha-vermelha.vercel.app), com onze fases, quatro modos e um desafio novo por dia. O que vem depois está em [Roteiro](#roteiro).
 
 ## Por que existe
 
@@ -55,15 +55,39 @@ Cada fase vale 3 estrelas por modo. Cada dica aberta custa uma: a primeira diz o
   </tr>
 </table>
 
-## As fases da v1
+## As fases
 
 | # | Fase | A falha | O que ela ensina |
 |---|---|---|---|
-| 1 | **RLS desligado** | A tabela nunca recebeu `ENABLE ROW LEVEL SECURITY` | A chave pública do site lê tudo. Ligar o RLS sem política tranca até os donos |
-| 4 | **Coluna sem vigia** | A política de UPDATE confere a linha, mas não a coluna `is_admin` | RLS decide **quais linhas**. Quem decide **quais colunas** é o grant |
-| 5 | **Metadata do usuário** | A política confia no `user_metadata`, que o próprio usuário edita | Permissão só pode vir do que o servidor escreve |
+| | **Nível 1 · Portas abertas** | | |
+| 1 | RLS desligado | A tabela nunca recebeu `ENABLE ROW LEVEL SECURITY` | A chave pública do site lê tudo. Ligar o RLS sem política tranca até os donos |
+| 2 | A política provisória | `USING (true)`, esquecida desde o protótipo | RLS ligado não quer dizer RLS certo |
+| 3 | Linhas órfãs | `OR user_id IS NULL`, por causa dos registros de visitante | Linha sem dono não é de todo mundo: é de ninguém |
+| | **Nível 2 · Confiança no cliente** | | |
+| 4 | Coluna sem vigia | A política de UPDATE confere a linha, mas não a coluna `is_admin` | RLS decide **quais linhas**. Quem decide **quais colunas** é o grant |
+| 5 | Metadata do usuário | A política confia no `user_metadata`, que o próprio usuário edita | Permissão só pode vir do que o servidor escreve |
+| 6 | Entrei no time dos outros | Qualquer pessoa se inscreve em qualquer time | Numa tabela de participação, a linha em si é a permissão |
+| 7 | O domínio certo | A política libera pelo domínio do e-mail, que ninguém confirma | E-mail é um texto que a pessoa digitou |
+| | **Nível 3 · Atalhos que furam** | | |
+| 8 | A view que ignora RLS | Uma view comum roda com as permissões de quem a criou | `security_invoker` |
+| 9 | A função que confia no parâmetro | `SECURITY DEFINER` que recebe o id como argumento | De quem são os dados vem de `auth.uid()`, nunca do cliente |
+| 10 | Políticas que somam | Uma restrição criada como permissiva, que soma com OU | `AS RESTRICTIVE` |
+| 11 | Não vejo, mas sei que existe | O RLS esconde a linha, e o erro de valor único conta que ela existe | Restrições olham a tabela inteira |
 
-A numeração segue o catálogo completo, que tem 13 fases em 4 níveis. As outras entram uma a uma.
+Vencer uma fase em qualquer modo libera a seguinte. O nível 4, com console SQL, ainda não existe.
+
+Na fase 11 a linha nunca aparece: você deduz o valor com mil tentativas e o informa numa caixa de resposta.
+
+## Desafio diário
+
+Todo dia tem uma fase nova, **igual para todo mundo**. Ela não é escrita por ninguém: a data vira a semente de um sorteio que escolhe uma família de falha (oito, hoje), um cenário (padaria, clínica, academia, escola, oficina, pet shop, biblioteca, pousada), os dados e a linha-alvo, e monta a fase inteira, com tabelas, políticas furadas, gabarito, dicas, ataque e conserto de referência.
+
+- **Sem servidor.** O gerador é uma função pura que roda no navegador. O mesmo dia dá o mesmo desafio em qualquer aparelho.
+- **Sempre jogável.** Os testes conferem toda combinação de família e cenário contra o banco: o ataque de referência tem de derrubar a versão furada, e o conserto tem de passar na bateria. `npm run prova:diario` faz isso para os 365 dias de um ano.
+- **Sem repetição seguida.** A cada oito dias todas as famílias aparecem uma vez, em ordem sorteada.
+- **Sequência.** Dias seguidos contam, e a sequência não zera antes de o dia acabar.
+
+As famílias são as fases 1, 2, 3, 4, 5, 8, 9 e 10 com outra roupa. As fases 6, 7 e 11 têm um desenho próprio demais para o sorteio e ficaram de fora.
 
 ## Design
 
@@ -76,7 +100,7 @@ A interface parte do tema escuro dos consoles de nuvem (a referência foi o cons
 - **A cor diz em que modo você está.** O gradiente quente (vermelho, laranja, amarelo) é do Ataque. O frio (azul, roxo, rosa) é da Defesa. O completo, que vai de um ao outro, é do Ciclo e dos títulos.
 - **Gradiente na borda e no texto, quase nunca no preenchimento.** Os cartões e botões são escuros por dentro, e só o contorno carrega a cor. O conteúdo continua legível, e a tela não vira um carnaval. As exceções são de propósito: o botão **Jogar** da abertura e os carimbos de vitória, que são as únicas coisas da tela pedindo para serem vistas primeiro.
 - **A abertura mostra o jogo em vez de descrevê-lo.** Um console se digita sozinho, traz o pedido que não devia, carimba "Você cruzou a linha", vira para a Defesa e fecha a grade. Quem chega entende a proposta em dez segundos, sem ler.
-- **A linha vermelha é a trilha de progresso.** As fases são pontos numa linha que acende até onde você chegou. Os pontos trancados e os que ainda vêm ficam apagados, à frente.
+- **A linha vermelha é a trilha de progresso.** As fases são pontos numa linha que acende até onde você chegou. Os pontos trancados e os que ainda vêm ficam apagados, à frente. Tocar num ponto mostra a fase.
 - **Patente e estrelas.** O progresso aparece como num jogo: uma barra, um total de estrelas e um título que sobe de Visitante a Lenda da linha.
 - **Botões em pílula.** A ação principal tem borda em gradiente e brilha de leve ao passar o mouse. A secundária tem borda cinza.
 - **Vermelho com um significado só.** Na grade "quem vê o quê", vermelho quer dizer que a política diverge do que deveria ser. Ele não aparece como enfeite em nenhum outro lugar da Defesa.
@@ -150,7 +174,8 @@ Sem configuração, o progresso fica guardado no navegador. Para sincronizar com
 | `npm run typecheck` | Os tipos |
 | `npm run prova:node` · `prova:navegador` | O PGlite com RLS e sessão não-superusuário, em Node e num Web Worker. Rodar antes de trocar a versão do PGlite |
 | `npm run prova:jogador` | O Worker do jogador num navegador de verdade, com laço infinito e tudo |
-| `npm run prova:site` | O site exportado, jogado de ponta a ponta nos quatro modos. Faz um build próprio, sem Firebase |
+| `npm run prova:site` | O site exportado, jogado de ponta a ponta: as onze fases, os quatro modos e o desafio de hoje. Faz um build próprio, sem Firebase |
+| `npm run prova:diario` | O desafio diário de um ano inteiro, dia por dia, contra o banco. Leva alguns minutos |
 | `npm run prova:regras` | As regras do Firestore, no emulador (precisa de Java 17 ou mais novo) |
 | `npm run prova:nuvem` | O progresso na nuvem, contra os emuladores de Auth e Firestore |
 
@@ -196,6 +221,7 @@ Os testes não deixam uma fase impossível ou com o gabarito errado ir adiante: 
 | `motor/` | TypeScript puro, sem React: sessões, tradutor, partida, bateria, grade e laboratório |
 | `cliente/` | O `supabase` falso e o Worker do jogador |
 | `fases/` | Uma pasta por fase |
+| `desafio/` | O gerador do desafio diário e o conteúdo dos cenários |
 | `jogo/` | A cola entre as telas e o motor: Worker do banco, progresso, nuvem |
 | `app/` · `componentes/` | As telas |
 | `mensagens/` | Todo texto da interface, do motor e do cliente, separado por idioma |
@@ -207,7 +233,8 @@ Os testes não deixam uma fase impossível ou com o gabarito errado ir adiante: 
 - [x] Publicar: [linha-vermelha.vercel.app](https://linha-vermelha.vercel.app)
 - [ ] Domínio próprio
 - [ ] Teste com jogadores de verdade, para calibrar as dicas
-- [ ] As fases 2, 3 e 6 a 11, uma por vez: política provisória, linhas órfãs, convite que ninguém confere, view que ignora RLS, função que confia no parâmetro e outras
+- [x] As fases 2, 3 e 6 a 11
+- [x] Desafio diário gerado pela data
 - [ ] Nível 4, com console SQL: o dono que não obedece ao RLS e o sequestro de `search_path`
 - [ ] Ranking com verificação no servidor, usando o mesmo motor
 - [ ] Inglês: os textos já estão separados por idioma

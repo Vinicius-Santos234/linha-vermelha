@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { banco } from '../jogo/banco'
-import { faseDaTela, type FaseDaTela } from '../jogo/fases'
+import { faseDaTela, rotaDe, rotaDeVolta, type FaseDaTela } from '../jogo/fases'
 import { estrelasPara, registrarVitoria } from '../jogo/progresso'
 import { t } from '../jogo/t'
 import type { ResultadoDaBateria, Teste } from '../motor/bateria'
@@ -75,7 +75,7 @@ export function TelaDefesa({ id, ciclo }: { id: string; ciclo?: { ataque: Chamad
 
   return (
     <>
-      <Topo faseId={id} titulo={`${fase.numero}. ${fase.texto.titulo}`} modo={ciclo ? 'ciclo' : 'defesa'} estrelas={estrelas} etapa={ciclo && t('ciclo.etapaDefesa')} />
+      <Topo faseId={id} titulo={fase.rotulo} modo={ciclo ? 'ciclo' : 'defesa'} estrelas={estrelas} etapa={ciclo && t('ciclo.etapaDefesa')} />
       <main className="fase">
         <div className="coluna">
           <section className="cartao borda-fria">
@@ -97,11 +97,11 @@ export function TelaDefesa({ id, ciclo }: { id: string; ciclo?: { ataque: Chamad
               <Texto markdown={fase.texto.explicacao} />
               <div className="acoes">
                 {!ciclo && (
-                  <Link className="botao borda-quente" href={`/fase/${id}/ataque/`}>
+                  <Link className="botao borda-quente" href={rotaDe(id, 'ataque')}>
                     {t('vitoria.irParaAtaque')}
                   </Link>
                 )}
-                <Link className={ciclo ? 'botao borda-completa' : 'botao-liso'} href="/fases/">
+                <Link className={ciclo ? 'botao borda-completa' : 'botao-liso'} href={rotaDeVolta(id)}>
                   {t('vitoria.voltar')}
                 </Link>
               </div>

@@ -82,11 +82,13 @@ try {
   await pagina.getByRole('link', { name: /Começar a jogar/ }).waitFor()
   checar('0a. o início oferece começar pela fase 1 no Ataque', (await pagina.getByRole('link', { name: /Começar a jogar/ }).innerText()).includes('Fase 1 · Ataque'))
   checar('0b. e a escolha de modo, com os quatro modos', (await pagina.locator('.modo-cartao').count()) === 4)
+  await pagina.locator('.trilha .ponto.trancado button').last().click()
+  checar('0c. na primeira visita, tocar num ponto trancado mostra a fase sem deixar jogar', (await pagina.locator('.trilha .ponto.trancado').count()) === 10 && (await pagina.locator('.faixa > .ponto-cartao.trancado').count()) === 1 && (await pagina.locator('.faixa > .ponto-cartao .chip-modo').count()) === 0)
   await foto('0-inicio')
   await pagina.goto(`${origem}/fases/`)
   await pagina.getByRole('link', { name: 'Atacar' }).first().waitFor()
   checar('1a. a página inicial lista a fase 1', await pagina.getByRole('heading', { name: 'RLS desligado' }).isVisible())
-  checar('1c. as fases seguintes começam trancadas', (await pagina.locator('.fase-cartao.trancada').count()) === 2 && (await pagina.getByRole('link', { name: 'Atacar' }).count()) === 1)
+  checar('1c. só a primeira das 11 fases começa aberta', (await pagina.locator('.fase-cartao.trancada').count()) === 10 && (await pagina.getByRole('link', { name: 'Atacar' }).count()) === 1)
   checar('1b. o PGlite não é baixado na página inicial', ![...baixado.keys()].some((c) => c.includes('pglite')), [...baixado.keys()].length + ' arquivos')
   await foto('1-inicio')
 
@@ -153,7 +155,7 @@ try {
   await pagina.waitForFunction(() => document.querySelectorAll('.fase-cartao .estrelas .acesa').length > 0)
   const acesas = await pagina.locator('.fase-cartao .estrelas .acesa').count()
   checar('4a. o início mostra as estrelas ganhas (3 no ataque, 3 na defesa)', acesas === 6, `${acesas} estrelas`)
-  checar('4c. vencer a fase 1 liberou a fase 4, e a 5 segue trancada', (await pagina.locator('.fase-cartao.trancada').count()) === 1)
+  checar('4c. vencer a fase 1 liberou só a fase 2', (await pagina.locator('.fase-cartao.trancada').count()) === 9)
   await foto('7-inicio-com-estrelas')
 
   // ---------- Fase 4, no Ciclo completo ----------
@@ -219,10 +221,80 @@ await supabase.from('pedidos').select()`)
   checar('7d. só as fases vencidas aparecem para carregar', (await pagina.locator('#carregar option').count()) === 5, `${await pagina.locator('#carregar option').count()} opções`)
   await foto('13-laboratorio')
 
+  // ---------- As fases novas, jogadas pelo código da dica 3 ----------
+  /** Abre as três dicas e devolve o código da última: o ataque ou o conserto de referência. */
+  const dica3 = async () => {
+    for (const n of [1, 2, 3]) await pagina.getByRole('button', { name: `Abrir dica ${n}` }).click()
+    return pagina.locator('.dica').last().locator('pre').last().innerText()
+  }
+  const abrirAtaque = async (caminho) => {
+    await pagina.goto(`${origem}${caminho}`)
+    await pagina.getByText('As respostas do app aparecem aqui.').waitFor({ timeout: 60000 })
+  }
+  const venceComADica = async (caminho) => {
+    await abrirAtaque(caminho)
+    await escrever(await dica3())
+    await pagina.keyboard.press('Control+Enter')
+    return pagina.getByText('Você cruzou a linha').waitFor({ timeout: 20000 }).then(() => true, () => false)
+  }
+  for (const [numero, id] of [[2, '02-politica-provisoria'], [3, '03-linhas-orfas'], [6, '06-entrei-no-time-dos-outros'], [7, '07-o-dominio-certo'], [10, '10-politicas-que-somam']]) {
+    checar(`9a. fase ${numero}: o ataque da dica 3 vence`, await venceComADica(`/fase/${id}/ataque/`))
+  }
+  checar('9b. fase 8: o ataque pela view vence', await venceComADica('/fase/08-a-view-que-ignora-rls/ataque/'))
+  checar('9c. e a dica 2 mostra como a view foi criada', (await pagina.locator('.politicas').innerText()).includes('view pedidos_resumo'))
+  checar('9d. fase 9: o ataque pela função (rpc) vence', await venceComADica('/fase/09-a-funcao-que-confia-no-parametro/ataque/'))
+  checar('9e. o schema lista a função, e a dica 2 mostra o código dela', (await pagina.locator('.schema').innerText()).includes('pedidos_do_usuario') && (await pagina.locator('.politicas').innerText()).includes('SECURITY DEFINER'))
+
+  // Fase 11: mil tentativas dentro do tempo limite, e a resposta digitada.
+  await abrirAtaque('/fase/11-nao-vejo-mas-sei-que-existe/ataque/')
+  await escrever(await dica3())
+  const inicioDoLaco = Date.now()
+  await pagina.keyboard.press('Control+Enter')
+  await pagina.getByRole('button', { name: /Executando/ }).waitFor({ timeout: 5000 }).catch(() => {})
+  await pagina.getByRole('button', { name: /Executar/ }).waitFor({ timeout: 40000 })
+  const saidaDoLaco = await pagina.locator('.saida').innerText()
+  checar('10a. fase 11: o laço de mil tentativas termina dentro do tempo limite', !saidaDoLaco.includes('foi interrompido'), `${Date.now() - inicioDoLaco} ms`)
+  checar('10b. o erro de valor repetido entrega o código do Bruno, sem a linha aparecer', saidaDoLaco.includes('já existe: PADARIA-042') && (await pagina.getByText('Você cruzou a linha').count()) === 0)
+  await pagina.getByLabel('O valor que você descobriu').fill('PADARIA-999')
+  await pagina.getByRole('button', { name: 'Conferir' }).click()
+  await pagina.getByText('Não é esse').waitFor()
+  await pagina.getByLabel('O valor que você descobriu').fill('padaria-042')
+  await pagina.getByRole('button', { name: 'Conferir' }).click()
+  checar('10c. a resposta errada é recusada, e a certa vence a fase', await pagina.getByText('Você cruzou a linha').waitFor({ timeout: 10000 }).then(() => true, () => false))
+
+  // ---------- Desafio diário ----------
+  await pagina.goto(`${origem}/diario/`)
+  await pagina.getByRole('link', { name: 'Atacar' }).waitFor({ timeout: 20000 })
+  const tituloDoDia = await pagina.locator('h1').innerText()
+  checar('11a. a página do desafio mostra o de hoje, com sequência zerada', /Desafio de \d\d\/\d\d · /.test(tituloDoDia) && (await pagina.getByText('Sequência: 0 dia(s)').count()) === 1, tituloDoDia)
+  await foto('15-diario')
+  await pagina.getByRole('link', { name: 'Atacar' }).click()
+  await pagina.getByText('As respostas do app aparecem aqui.').waitFor({ timeout: 60000 })
+  await escrever(await dica3())
+  await pagina.keyboard.press('Control+Enter')
+  checar('11b. o ataque de referência do dia vence', await pagina.getByText('Você cruzou a linha').waitFor({ timeout: 20000 }).then(() => true, () => false), tituloDoDia)
+  await pagina.getByRole('link', { name: 'Agora conserte' }).click()
+  await pagina.locator('table.grade').first().waitFor({ timeout: 60000 })
+  await escrever(await dica3())
+  await rodarTestes()
+  checar('11c. o conserto de referência do dia passa na bateria', await pagina.getByText('Linha fechada').waitFor({ timeout: 30000 }).then(() => true, () => false), (await pagina.locator('.testes li.falhou').allInnerTexts()).join(' | ').slice(0, 200))
+  await pagina.getByRole('link', { name: 'Voltar às fases' }).click()
+  await pagina.getByText('Sequência: 1 dia(s)').waitFor({ timeout: 10000 })
+  checar('11d. vencer o desafio conta um dia de sequência', (await pagina.getByText('O de hoje está feito').count()) === 1)
+
+  // ---------- A abertura com a trilha e o desafio ----------
+  await pagina.goto(`${origem}/`)
+  await pagina.locator('.diario-cartao').waitFor({ timeout: 20000 })
+  checar('12a. a trilha tem as 11 fases e o ponto das que vêm', (await pagina.locator('.trilha .ponto').count()) === 12 && (await pagina.locator('.trilha .ponto.futuro').innerText()).trim() === '+2')
+  checar('12b. a abertura mostra o desafio de hoje, já com as estrelas', (await pagina.locator('.diario-cartao .estrelas .acesa').count()) > 0 && (await pagina.locator('.diario-cartao').innerText()).includes('Jogar de novo'))
+  await pagina.locator('.trilha .ponto button').last().click()
+  checar('12c. com tudo vencido, nenhum ponto fica trancado e o último abre para jogar', (await pagina.locator('.trilha .ponto.trancado').count()) === 0 && (await pagina.locator('.faixa > .ponto-cartao .chip-modo').count()) === 3 && (await pagina.locator('.faixa > .ponto-cartao h3').innerText()).includes('Não vejo'))
+  await foto('16-abertura')
+
   // ---------- Continuar e ajuda ----------
   await pagina.goto(`${origem}/`)
-  await pagina.getByRole('link', { name: /Continuar/ }).waitFor()
-  checar('7e. com progresso, o início vira "Continuar" e aponta o que falta (o Ciclo da fase 1)', (await pagina.getByRole('link', { name: /Continuar/ }).innerText()).includes('Fase 1 · Ciclo completo'), (await pagina.getByRole('link', { name: /Continuar/ }).innerText()).replace(/\n/g, ' '))
+  await pagina.locator('a.jogar').waitFor()
+  checar('7e. com progresso, o início vira "Continuar" e aponta o que falta (o Ciclo da fase 1)', (await pagina.locator('a.jogar').innerText()).includes('Fase 1 · Ciclo completo'), (await pagina.locator('a.jogar').innerText()).replace(/\n/g, ' '))
   await pagina.goto(`${origem}/ajuda/`)
   const ajuda = await pagina.locator('main').innerText()
   checar('7f. a ajuda lista o que o cliente tem e o que não tem', ajuda.includes('.maybeSingle()') && ajuda.includes('supabase.auth.updateUser({ data })') && ajuda.includes('.range()'))

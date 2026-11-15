@@ -1,0 +1,15 @@
+[
+  {
+    "tipo": "auth",
+    "metodo": "signInWithPassword",
+    "email": "alice@exemplo.com",
+    "senha": "paodequeijo"
+  },
+  {
+    "tipo": "from",
+    "tabela": "pedidos_resumo",
+    "operacao": "select",
+    "filtros": [],
+    "colunas": "*"
+  }
+]

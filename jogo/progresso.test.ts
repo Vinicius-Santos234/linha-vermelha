@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { estrelasPara, mesclar, patente, totalDeEstrelas, type Conquista } from './progresso'
+import { estrelasPara, mesclar, patente, sequencia, totalDeEstrelas, type Conquista } from './progresso'
 
 const c = (estrelas: number, quando = '2026-11-15T00:00:00.000Z'): Conquista => ({ estrelas, dicas: 3 - estrelas, concluidaEm: quando })
 
@@ -25,6 +25,18 @@ describe('progresso', () => {
   it('soma as estrelas de todas as fases e modos', () => {
     expect(totalDeEstrelas({})).toBe(0)
     expect(totalDeEstrelas({ f1: { ataque: c(3), defesa: c(1) }, f4: { ciclo: c(2) } })).toBe(6)
+  })
+
+  it('as estrelas do desafio diário não entram no total da campanha', () => {
+    expect(totalDeEstrelas({ f1: { ataque: c(3) }, 'diario-2027-01-05': { ciclo: c(3) } })).toBe(3)
+  })
+
+  it('a sequência conta os dias seguidos, e não zera antes de o dia acabar', () => {
+    const p = { 'diario-2027-03-01': { ataque: c(3) }, 'diario-2027-02-28': { ciclo: c(1) }, 'diario-2027-02-27': { defesa: c(2) }, 'diario-2027-02-25': { ataque: c(3) } }
+    expect(sequencia(p, '2027-03-01')).toBe(3)
+    expect(sequencia(p, '2027-03-02')).toBe(3)
+    expect(sequencia(p, '2027-03-03')).toBe(0)
+    expect(sequencia({}, '2027-03-01')).toBe(0)
   })
 
   it('a patente sobe com as estrelas, e a última só vem com todas', () => {

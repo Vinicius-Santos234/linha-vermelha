@@ -1,0 +1,474 @@
+[
+  {
+    "tipo": "auth",
+    "metodo": "signInWithPassword",
+    "email": "alice@exemplo.com",
+    "senha": "paodequeijo"
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-000",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-001",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-002",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-003",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-004",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-005",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-006",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-008",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-009",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-010",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-011",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-012",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-013",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-014",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-015",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-016",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-017",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-018",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-019",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-020",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-021",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-022",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-023",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-024",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-025",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-026",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-027",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-028",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-029",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-030",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-031",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-032",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-033",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-034",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-035",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-036",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-037",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-038",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-039",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-040",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-041",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "from",
+    "tabela": "cupons",
+    "operacao": "insert",
+    "filtros": [],
+    "valores": {
+      "user_id": "a11ce000-0000-4000-8000-000000000001",
+      "codigo": "PADARIA-042",
+      "desconto": 0
+    }
+  },
+  {
+    "tipo": "resposta",
+    "valor": "PADARIA-042"
+  }
+]

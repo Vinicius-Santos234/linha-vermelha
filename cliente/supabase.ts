@@ -140,7 +140,8 @@ export function criarSupabase(enviar: Enviar): Supabase {
 }
 
 /** O ataque de referência de uma fase: código de verdade contra o cliente falso. */
-export type Ataque = (supabase: Supabase) => Promise<void>
+/** O segundo argumento só importa nas fases de descobrir: é por ele que o ataque informa o valor deduzido. */
+export type Ataque = (supabase: Supabase, responder: (valor: string) => Promise<void>) => Promise<void>
 
 export function definirAtaque(ataque: Ataque): Ataque {
   return ataque

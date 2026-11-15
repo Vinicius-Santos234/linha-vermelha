@@ -1,0 +1,15 @@
+[
+  {
+    "tipo": "from",
+    "tabela": "pedidos",
+    "operacao": "select",
+    "filtros": [
+      {
+        "coluna": "user_id",
+        "op": "is",
+        "valor": null
+      }
+    ],
+    "colunas": "*"
+  }
+]

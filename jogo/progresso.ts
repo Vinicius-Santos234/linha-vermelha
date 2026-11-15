@@ -18,8 +18,29 @@ export function estrelasPara(dicasAbertas: number): number {
   return Math.max(1, 3 - dicasAbertas)
 }
 
+const DIARIO = 'diario-'
+
+/** As estrelas da campanha. As do desafio diário não entram: ele não tem fim. */
 export function totalDeEstrelas(progresso: Progresso): number {
-  return Object.values(progresso).reduce((soma, modos) => soma + Object.values(modos).reduce((s, c) => s + (c?.estrelas ?? 0), 0), 0)
+  return Object.entries(progresso)
+    .filter(([id]) => !id.startsWith(DIARIO))
+    .reduce((soma, [, modos]) => soma + Object.values(modos).reduce((s, c) => s + (c?.estrelas ?? 0), 0), 0)
+}
+
+/**
+ * Quantos dias seguidos de desafio diário, terminando hoje. Se o de hoje ainda não foi
+ * feito, a sequência que vinha até ontem continua valendo.
+ */
+export function sequencia(progresso: Progresso, hoje: string): number {
+  const feito = (data: string) => Object.keys(progresso[DIARIO + data] ?? {}).length > 0
+  const anterior = (data: string) => new Date(Date.parse(`${data}T00:00:00Z`) - 86_400_000).toISOString().slice(0, 10)
+  let dia = feito(hoje) ? hoje : anterior(hoje)
+  let dias = 0
+  while (feito(dia)) {
+    dias++
+    dia = anterior(dia)
+  }
+  return dias
 }
 
 /** O título do jogador, pela fração das estrelas que ele já tem. */

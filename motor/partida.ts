@@ -14,6 +14,8 @@ export class Partida {
   /** Quem está logado agora. Começa como visitante, igual a um app aberto pela primeira vez. */
   usuario: Usuario = ANON
   venceu = false
+  /** Fase de descobrir: o banco confirmou ao jogador que o valor escondido existe. */
+  vazou = false
   /** Tudo o que o jogador chamou, na ordem. No Ciclo completo, vira teste da Defesa. */
   readonly historico: Chamada[] = []
 
@@ -45,6 +47,8 @@ export class Partida {
         return this.rpc(tx, chamada)
       case 'auth':
         return this.auth(tx, chamada)
+      case 'resposta':
+        return Promise.resolve(this.responder(chamada.valor))
       default:
         throw new ErroDeChamada(t('partida.chamadaDesconhecida'), 'JOGO_CHAMADA_INVALIDA')
     }
@@ -53,7 +57,10 @@ export class Partida {
   private async from(tx: Transaction, c: ChamadaFrom): Promise<RespostaCliente> {
     const { sql, params } = traduzirFrom(c)
     const r = await executarEm(tx, this.usuario, sql, params)
-    if (r.error) return { data: null, error: paraErroCliente(r.error) }
+    if (r.error) {
+      this.conferirVazamento(c, r.error)
+      return { data: null, error: paraErroCliente(r.error) }
+    }
 
     const devolveLinhas = c.operacao === 'select' || c.retornar !== undefined
     let resposta: RespostaCliente = { data: devolveLinhas ? r.data : null, error: null }
@@ -68,6 +75,7 @@ export class Partida {
     const { sql, params } = traduzirRpc(c)
     const r = await executarEm(tx, this.usuario, sql, params)
     if (r.error) return { data: null, error: paraErroCliente(r.error) }
+    this.conferirLinhas(c.nome, r.data ?? [])
     await this.conferirEstado(tx)
     // Função que devolve um valor só aparece como uma linha com uma coluna de mesmo nome.
     const linhas = r.data ?? []
@@ -78,7 +86,7 @@ export class Partida {
   /** Objetivo de ler: a linha-alvo veio nesta resposta? */
   private async conferirLeitura(tx: Transaction, c: ChamadaFrom, linhas: Linha[]): Promise<void> {
     const objetivo = this.sessao.fase.def.objetivo
-    if (this.venceu || objetivo.tipo !== 'ler' || c.tabela !== objetivo.tabela) return
+    if (this.venceu || objetivo.tipo !== 'ler' || !this.entregaOAlvo(c.tabela)) return
     const chave = regraDe(this.sessao.fase.def, objetivo.tabela).chave
     let chaves: unknown[]
     if (c.operacao === 'select') {
@@ -90,6 +98,39 @@ export class Partida {
       chaves = linhas.map((l) => l[chave])
     }
     if (chaves.some((k) => String(k) === String(objetivo.id))) this.venceu = true
+  }
+
+  /** A tabela do objetivo, ou uma view ou função declarada como outro caminho até ela. */
+  private entregaOAlvo(relacao: string): boolean {
+    const objetivo = this.sessao.fase.def.objetivo
+    return objetivo.tipo === 'ler' && (relacao === objetivo.tabela || (objetivo.tambemPor ?? []).includes(relacao))
+  }
+
+  /** Objetivo de ler por função: a linha-alvo veio no que o rpc devolveu? */
+  private conferirLinhas(relacao: string, linhas: Linha[]): void {
+    const objetivo = this.sessao.fase.def.objetivo
+    if (this.venceu || objetivo.tipo !== 'ler' || !this.entregaOAlvo(relacao)) return
+    const chave = regraDe(this.sessao.fase.def, objetivo.tabela).chave
+    if (linhas.some((l) => String(l[chave]) === String(objetivo.id))) this.venceu = true
+  }
+
+  /**
+   * Objetivo de descobrir: o erro de valor repetido (23505) numa chamada que carrega o
+   * valor escondido é o banco confirmando que ele existe. É por aí que a bateria sabe
+   * se o vazamento continua aberto.
+   */
+  private conferirVazamento(c: ChamadaFrom, erro: ErroSql): void {
+    const objetivo = this.sessao.fase.def.objetivo
+    if (objetivo.tipo !== 'descobrir' || c.tabela !== objetivo.tabela || erro.code !== '23505') return
+    if (JSON.stringify(c.valores ?? null).includes(objetivo.resposta)) this.vazou = true
+  }
+
+  /** Objetivo de descobrir: o jogador diz o valor que deduziu. */
+  private responder(valor: unknown): RespostaCliente {
+    const objetivo = this.sessao.fase.def.objetivo
+    const certo = objetivo.tipo === 'descobrir' && String(valor).trim().toUpperCase() === objetivo.resposta.toUpperCase()
+    if (certo) this.venceu = true
+    return { data: { certo }, error: null }
   }
 
   /** Objetivo de alterar: o banco ficou no estado pedido? */
@@ -169,7 +210,8 @@ export async function reproduzirAtaque(sessao: Sessao, chamadas: Chamada[]): Pro
     const partida = new Partida(sessao, tx)
     for (const chamada of chamadas) await partida.chamar(chamada)
     await tx.rollback()
-    return partida.venceu
+    // Saber a resposta não é o ataque: o ataque é o banco ainda confirmá-la.
+    return sessao.fase.def.objetivo.tipo === 'descobrir' ? partida.vazou : partida.venceu
   })) as boolean
 }
 

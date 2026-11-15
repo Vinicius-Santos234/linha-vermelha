@@ -1,7 +1,8 @@
 // O Worker do banco: aqui moram o PGlite e o motor. As telas só mandam pedidos.
 import { abrirFase, criarBase, ErroNoSqlDoJogador, explorar, montarGrade, Partida, rodarBateria, usarPGlite, type AtaqueNomeado, type Sessao, type Snapshot } from '../motor'
 import { t } from './t'
-import { baseSql, pacotes, versaoPGlite } from './fases.gerado'
+import { baseSql, versaoPGlite } from './fases.gerado'
+import { pacoteDe } from './pacotes'
 import type { AvaliacaoDaDefesa, Banco, Pedido, PoliticasDaTabela, Retorno, TabelaDoSchema } from './protocolo-banco'
 
 const escopo = self as unknown as {
@@ -22,11 +23,7 @@ function pegarBase(): Promise<Snapshot> {
   }))
 }
 
-function pacote(id: string) {
-  const achado = pacotes.find((p) => p.def.id === id)
-  if (!achado) throw new Error(`Não existe a fase ${id}.`)
-  return achado
-}
+const pacote = pacoteDe
 
 const LIMITE_DE_CHAMADAS = 500
 
@@ -52,7 +49,16 @@ const banco: Banco = {
       if (!tabela) schema.push((tabela = { nome: linha.tabela, colunas: [] }))
       tabela.colunas.push({ nome: linha.coluna, tipo: linha.tipo })
     }
-    return { schema }
+    const funcoes = await sessao.db.query<{ nome: string; argumentos: string }>(`
+      select p.proname as nome, pg_get_function_identity_arguments(p.oid) as argumentos
+        from pg_proc p where p.pronamespace = 'public'::regnamespace order by p.proname`)
+    return { schema, funcoes: funcoes.rows }
+  },
+
+  async responder(valor) {
+    if (!partida) throw new Error('A fase ainda não foi aberta.')
+    const r = await partida.chamar({ tipo: 'resposta', valor })
+    return { certo: (r.data as { certo: boolean }).certo, venceu: partida.venceu }
   },
 
   async chamar(chamada) {
@@ -70,11 +76,29 @@ const banco: Banco = {
       select tablename as tabela, policyname as nome, cmd as comando, array_to_string(roles, ', ') as papeis,
              qual as usando, with_check as checando
         from pg_policies where schemaname = 'public' order by tablename, policyname`)
-    return tabelas.rows.map((t): PoliticasDaTabela => ({
-      tabela: t.tabela,
-      rlsLigado: t.rls,
-      politicas: politicas.rows.filter((p) => p.tabela === t.tabela).map(({ tabela: _, ...resto }) => resto),
-    }))
+    // Além das políticas: como as views, as funções e as restrições foram criadas.
+    const definicoes = await sessao.db.query<{ titulo: string; sql: string }>(`
+      select 'view ' || c.relname as titulo,
+             'create view public.' || c.relname ||
+             case when c.reloptions is null then '' else ' with (' || array_to_string(c.reloptions, ', ') || ')' end ||
+             E' as\n' || pg_get_viewdef(c.oid) as sql
+        from pg_class c where c.relnamespace = 'public'::regnamespace and c.relkind = 'v'
+      union all
+      select 'função ' || p.proname, pg_get_functiondef(p.oid)
+        from pg_proc p where p.pronamespace = 'public'::regnamespace
+      union all
+      select 'restrição em ' || c.relname, 'alter table public.' || c.relname || ' add constraint ' || k.conname || ' ' || pg_get_constraintdef(k.oid)
+        from pg_constraint k join pg_class c on c.oid = k.conrelid
+       where c.relnamespace = 'public'::regnamespace and k.contype = 'u'
+       order by 1`)
+    return {
+      tabelas: tabelas.rows.map((linha): PoliticasDaTabela => ({
+        tabela: linha.tabela,
+        rlsLigado: linha.rls,
+        politicas: politicas.rows.filter((p) => p.tabela === linha.tabela).map(({ tabela: _, ...resto }) => resto),
+      })),
+      definicoes: definicoes.rows,
+    }
   },
 
   async ataqueDoJogador() {

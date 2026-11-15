@@ -581,11 +581,6 @@ table.dados tr.escondida td { color: #5f6368; text-decoration: line-through; tex
   .rodape { padding: 44px 16px 52px; }
 }
 @media (max-width: 560px) {
-  /* No celular a trilha desce: a linha fica à esquerda, de cima a baixo. */
-  .trilha { grid-template-columns: 1fr; gap: 14px; }
-  .trilha::before { left: 27px; right: auto; top: 28px; bottom: 28px; width: 4px; height: auto; background: linear-gradient(var(--vermelho), var(--laranja) var(--ate, 0%), var(--superficie-3) calc(var(--ate, 0%) + 5%)); }
-  .ponto { flex-direction: row; align-items: flex-start; }
-  .ponto .no { flex: none; }
   .cena .respostas li, .cena .respostas li.alvo { grid-template-columns: 30px 48px 1fr; }
   .cena .respostas em, .cena header small { display: none; }
   .cena .mini-grade td { width: 44px; }
@@ -595,3 +590,40 @@ table.dados tr.escondida td { color: #5f6368; text-decoration: line-through; tex
   .logo-jogo i, .jogar::after, .ponto.aberto .no, .cena .cursor, .cena .respostas li { animation: none; }
   .jogar, .cena .selo { transition: none; }
 }
+
+/* ---------- A trilha como fileira de pontos, e o desafio diário ---------- */
+.trilha-rolagem { overflow-x: auto; padding: 10px 6px 16px; margin: 0 -6px; }
+.trilha { display: flex; justify-content: space-between; gap: 10px; min-width: 660px; }
+.trilha::before { left: 29px; right: 29px; top: 27px; }
+.ponto { flex: none; }
+.ponto .no { cursor: pointer; padding: 0; font-family: var(--titulos); }
+.ponto.futuro .no { cursor: default; }
+.ponto.trancado .no { color: var(--texto-3); }
+.ponto.escolhido .no { outline: 3px solid #fff; outline-offset: 4px; }
+.faixa > .ponto-cartao { margin-top: 6px; }
+.faixa > .ponto-cartao.trancado { background: transparent; border-style: dashed; }
+.faixa > .ponto-cartao.trancado h3 { color: var(--texto-3); }
+
+.diario-cartao { --interior: var(--superficie); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px 32px; padding: 24px 28px; border-radius: 22px; transition: transform 0.12s; }
+.diario-cartao:hover { --interior: var(--superficie-2); transform: translateY(-2px); }
+.diario-cartao small { font: 700 12px var(--sans); letter-spacing: 0.08em; text-transform: uppercase; color: var(--texto-3); }
+.diario-cartao h3 { font-size: 30px; letter-spacing: -0.02em; margin: 4px 0 6px; align-self: flex-start; display: inline-block; }
+.diario-cartao p { margin: 0; color: var(--texto-2); max-width: 560px; }
+.diario-lado { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.sequencia { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
+.sequencia b { color: var(--amarelo); font-weight: 700; }
+.acoes-diario { display: flex; flex-wrap: wrap; gap: 22px; margin-top: 18px; }
+.acoes-diario .acao { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+
+.resposta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+.resposta input { flex: 1 1 160px; min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--borda); background: #101011; color: #fff; font: 14px var(--mono); }
+.resposta input::placeholder { color: var(--texto-3); font-family: var(--sans); }
+.erro-texto { color: var(--erro); font: 13px/1.5 var(--mono); }
+
+@media (prefers-reduced-motion: reduce) {
+  .diario-cartao { transition: none; }
+  .diario-cartao:hover { transform: none; }
+}
+
+.diario-cartao small { display: block; }
+.inicio .cartao > h2 { margin-top: 0; }

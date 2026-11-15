@@ -1,0 +1,29 @@
+[
+  {
+    "tipo": "auth",
+    "metodo": "signInWithPassword",
+    "email": "alice@exemplo.com",
+    "senha": "paodequeijo"
+  },
+  {
+    "tipo": "from",
+    "tabela": "avaliacoes",
+    "operacao": "select",
+    "filtros": [
+      {
+        "coluna": "nome",
+        "op": "eq",
+        "valor": "Bruno"
+      }
+    ],
+    "colunas": "user_id",
+    "unica": "single"
+  },
+  {
+    "tipo": "rpc",
+    "nome": "pedidos_do_usuario",
+    "args": {
+      "uid": "b0b00000-0000-4000-8000-000000000002"
+    }
+  }
+]

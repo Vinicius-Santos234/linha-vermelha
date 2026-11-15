@@ -21,7 +21,8 @@
     "prova:site": "node provas/04-site.mjs",
     "prova:regras": "npx -y firebase-tools@13.35.1 emulators:exec --only firestore --project demo-linha-vermelha \"vitest run --config vitest.regras.config.ts\"",
     "prova:nuvem": "npx -y firebase-tools@13.35.1 emulators:exec --only auth,firestore --project demo-linha-vermelha \"node provas/05-nuvem.mjs\"",
-    "gif": "node scripts/gif.mjs"
+    "gif": "node scripts/gif.mjs",
+    "prova:diario": "node scripts/ano.mjs"
   },
   "dependencies": {
     "@codemirror/commands": "6.11.1",

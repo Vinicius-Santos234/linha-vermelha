@@ -4,6 +4,7 @@ import type { Chamada } from '../motor/chamada'
 const v = (valor: unknown) => JSON.stringify(valor)?.replace(/"/g, "'") ?? 'undefined'
 
 export function descrever(c: Chamada): string {
+  if (c.tipo === 'resposta') return `resposta: ${v(c.valor)}`
   if (c.tipo === 'rpc') return `supabase.rpc('${c.nome}'${Object.keys(c.args ?? {}).length ? `, ${v(c.args)}` : ''})`
   if (c.tipo === 'auth') {
     if (c.metodo === 'signInWithPassword' || c.metodo === 'signUp') return `supabase.auth.${c.metodo}({ email: ${v(c.email)}, password: '•••' })`

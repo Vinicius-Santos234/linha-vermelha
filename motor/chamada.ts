@@ -42,7 +42,13 @@ export type ChamadaAuth =
   | { tipo: 'auth'; metodo: 'getUser' }
   | { tipo: 'auth'; metodo: 'signOut' }
 
-export type Chamada = ChamadaFrom | ChamadaRpc | ChamadaAuth
+/** A resposta do jogador numa fase de descobrir. Não vem do cliente supabase: vem da tela. */
+export interface ChamadaResposta {
+  tipo: 'resposta'
+  valor: unknown
+}
+
+export type Chamada = ChamadaFrom | ChamadaRpc | ChamadaAuth | ChamadaResposta
 
 /** O erro como o supabase-js entrega em `error`. */
 export interface ErroCliente {

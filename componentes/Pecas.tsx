@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
+import { rotaDe } from '../jogo/fases'
 import type { Modo } from '../jogo/progresso'
 import { t } from '../jogo/t'
 import { emBlocos, type Trecho } from '../jogo/texto'
@@ -26,9 +27,10 @@ export function Marca() {
 }
 
 /** O cabeçalho das páginas que não são de fase. */
-export function Navegacao({ atual }: { atual?: 'fases' | 'laboratorio' | 'ajuda' | 'perfil' }) {
+export function Navegacao({ atual }: { atual?: 'fases' | 'diario' | 'laboratorio' | 'ajuda' | 'perfil' }) {
   const links = [
     ['fases', '/fases/', t('nav.fases')],
+    ['diario', '/diario/', t('nav.diario')],
     ['laboratorio', '/laboratorio/', t('nav.laboratorio')],
     ['ajuda', '/ajuda/', t('ajuda.titulo')],
     ['perfil', '/perfil/', t('perfil.titulo')],
@@ -60,13 +62,13 @@ export function Topo({ faseId, titulo, modo, estrelas, etapa }: { faseId: string
       <span className="espaco" />
       <Estrelas quantas={estrelas} rotulo={t('topo.emJogo')} />
       <nav className="abas" aria-label={t('topo.modos')}>
-        <Link href={`/fase/${faseId}/ataque/`} aria-current={modo === 'ataque' ? 'page' : undefined}>
+        <Link href={rotaDe(faseId, 'ataque')} aria-current={modo === 'ataque' ? 'page' : undefined}>
           {t('modo.ataque')}
         </Link>
-        <Link href={`/fase/${faseId}/defesa/`} aria-current={modo === 'defesa' ? 'page' : undefined}>
+        <Link href={rotaDe(faseId, 'defesa')} aria-current={modo === 'defesa' ? 'page' : undefined}>
           {t('modo.defesa')}
         </Link>
-        <Link href={`/fase/${faseId}/ciclo/`} aria-current={modo === 'ciclo' ? 'page' : undefined}>
+        <Link href={rotaDe(faseId, 'ciclo')} aria-current={modo === 'ciclo' ? 'page' : undefined}>
           {t('modo.ciclo')}
         </Link>
       </nav>

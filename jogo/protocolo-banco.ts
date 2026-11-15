@@ -10,6 +10,17 @@ export interface TabelaDoSchema {
   colunas: { nome: string; tipo: string }[]
 }
 
+export interface FuncaoDoSchema {
+  nome: string
+  argumentos: string
+}
+
+/** Uma definição que a dica 2 mostra além das políticas: view, função ou restrição. */
+export interface Definicao {
+  titulo: string
+  sql: string
+}
+
 export interface PoliticasDaTabela {
   tabela: string
   rlsLigado: boolean
@@ -25,10 +36,12 @@ export interface AvaliacaoDaDefesa {
 
 export interface Banco {
   /** Abre (ou recomeça) a fase no modo Ataque e devolve o schema visível ao atacante. */
-  abrirAtaque(faseId: string): Promise<{ schema: TabelaDoSchema[] }>
+  abrirAtaque(faseId: string): Promise<{ schema: TabelaDoSchema[]; funcoes: FuncaoDoSchema[] }>
   chamar(chamada: Chamada): Promise<{ resposta: RespostaCliente; venceu: boolean; usuario: string }>
   /** A dica 2 do Ataque: o que o atacante normalmente não vê. */
-  politicas(): Promise<PoliticasDaTabela[]>
+  politicas(): Promise<{ tabelas: PoliticasDaTabela[]; definicoes: Definicao[] }>
+  /** Fase de descobrir: o jogador diz o valor que deduziu. */
+  responder(valor: string): Promise<{ certo: boolean; venceu: boolean }>
   /** Ciclo completo: tudo o que o jogador chamou nesta partida, para virar teste da Defesa. */
   ataqueDoJogador(): Promise<Chamada[]>
   /**

@@ -2,8 +2,9 @@
 
 import Link from 'next/link'
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
+import { gerarDesafio, hoje } from '../desafio/gerar'
 import { fases, fasesAbertas, TOTAL_DO_CATALOGO } from '../jogo/fases'
-import { aoMudarProgresso, lerProgresso, patente, totalDeEstrelas, type Modo, type Progresso } from '../jogo/progresso'
+import { aoMudarProgresso, lerProgresso, patente, sequencia, totalDeEstrelas, type Modo, type Progresso } from '../jogo/progresso'
 import { t, type Chave } from '../jogo/t'
 import { Cena } from './Cena'
 import { Estrelas } from './Pecas'
@@ -97,8 +98,12 @@ function ondeContinuar(progresso: Progresso) {
 export function Inicio() {
   // O progresso mora no navegador: só existe depois que a página monta.
   const [progresso, setProgresso] = useState<Progresso>({})
+  // A data é a do relógio de quem joga: também só existe depois que a página monta.
+  const [data, setData] = useState<string | null>(null)
+  const [escolhidaId, setEscolhidaId] = useState<string | null>(null)
   useEffect(() => {
     setProgresso(lerProgresso())
+    setData(hoje())
     return aoMudarProgresso(setProgresso)
   }, [])
 
@@ -106,6 +111,10 @@ export function Inicio() {
   const maximo = fases.length * MODOS.length * 3
   const abertas = fasesAbertas(progresso)
   const proximo = ondeContinuar(progresso)
+  // Na trilha, o ponto escolhido começa sendo a fase em que o jogador parou.
+  const escolhida = fases.find((f) => f.id === escolhidaId) ?? proximo?.fase ?? fases[0]!
+  const desafio = data ? gerarDesafio(data) : null
+  const estrelasDeHoje = desafio ? Math.max(0, ...Object.values(progresso[desafio.id] ?? {}).map((c) => c?.estrelas ?? 0)) : 0
 
   return (
     <main className="palco">
@@ -154,54 +163,78 @@ export function Inicio() {
         <Cena />
       </section>
 
+      {desafio && data && (
+        <section className="faixa">
+          <Link className="diario-cartao borda-completa" href="/diario/">
+            <div>
+              <small>
+                {t('diario.hoje')} · {data.slice(8)}/{data.slice(5, 7)}
+              </small>
+              <h3 className="gradiente">{desafio.cenario.app}</h3>
+              <p>{t('diario.texto')}</p>
+            </div>
+            <div className="diario-lado">
+              <span className="sequencia">
+                <b>{t('diario.sequencia', { n: sequencia(progresso, data) })}</b>
+              </span>
+              <Estrelas quantas={estrelasDeHoje} rotulo={t('diario.hoje')} />
+              <span className="botao borda-completa">{estrelasDeHoje ? t('diario.jogarDeNovo') : t('diario.jogar')}</span>
+            </div>
+          </Link>
+        </section>
+      )}
+
       <section className="faixa">
         <header>
           <h2>{t('trilha.titulo')}</h2>
           <p className="fraco">{t('trilha.sub')}</p>
         </header>
-        {/* A linha acende até o último ponto aberto. Cada ponto fica no começo da sua coluna. */}
-        <ol className="trilha" style={{ '--ate': `${((abertas.length - 1) / (fases.length + 1)) * 100}%` } as CSSProperties}>
-          {fases.map((fase) => {
-            const aberta = abertas.includes(fase)
-            const vencida = Object.keys(progresso[fase.id] ?? {}).length > 0
-            return (
-              <li key={fase.id} className={`ponto${vencida ? ' vencido' : aberta ? ' aberto' : ' trancado'}`}>
-                <span className="no" aria-hidden>
-                  {aberta ? String(fase.numero).padStart(2, '0') : CADEADO}
-                </span>
-                <div className="ponto-cartao">
-                  <small>{t('inicio.nivel', { n: fase.nivel })}</small>
-                  <h3>{fase.texto.titulo}</h3>
-                  {aberta ? (
-                    <>
-                      <p>{fase.texto.resumo}</p>
-                      <div className="ponto-modos">
-                        {MODOS.map(({ modo, curto, borda }) => (
-                          <Link key={modo} className={`chip-modo ${borda}`} href={`/fase/${fase.id}/${modo}/`}>
-                            {t(curto)}
-                            <Estrelas quantas={progresso[fase.id]?.[modo]?.estrelas ?? 0} rotulo={t(curto)} />
-                          </Link>
-                        ))}
-                      </div>
-                    </>
-                  ) : (
-                    <p>{t('inicio.trancada')}</p>
-                  )}
-                </div>
-              </li>
-            )
-          })}
-          <li className="ponto futuro">
-            <span className="no" aria-hidden>
-              +{TOTAL_DO_CATALOGO - fases.length}
-            </span>
-            <div className="ponto-cartao">
-              <small>{t('trilha.emBreve')}</small>
-              <h3>{t('trilha.aCaminho', { n: TOTAL_DO_CATALOGO - fases.length })}</h3>
-              <p>{t('trilha.aCaminhoTexto')}</p>
-            </div>
-          </li>
-        </ol>
+        {/* A linha acende até o último ponto aberto. Os pontos ficam igualmente espaçados. */}
+        <div className="trilha-rolagem">
+          <ol className="trilha" style={{ '--ate': `${(fases.indexOf(abertas.at(-1)!) / fases.length) * 100}%` } as CSSProperties}>
+            {fases.map((fase) => {
+              const aberta = abertas.includes(fase)
+              const vencida = Object.keys(progresso[fase.id] ?? {}).length > 0
+              return (
+                <li key={fase.id} className={`ponto${vencida ? ' vencido' : aberta ? ' aberto' : ' trancado'}${fase === escolhida ? ' escolhido' : ''}`}>
+                  <button className="no" onClick={() => setEscolhidaId(fase.id)} aria-pressed={fase === escolhida} aria-label={`${fase.rotulo}${aberta ? '' : ` (${t('trilha.trancada')})`}`}>
+                    {aberta ? String(fase.numero).padStart(2, '0') : CADEADO}
+                  </button>
+                </li>
+              )
+            })}
+            <li className="ponto futuro">
+              <span className="no" title={t('trilha.aCaminho', { n: TOTAL_DO_CATALOGO - fases.length })}>
+                +{TOTAL_DO_CATALOGO - fases.length}
+              </span>
+            </li>
+          </ol>
+        </div>
+
+        <div className={`ponto-cartao${abertas.includes(escolhida) ? '' : ' trancado'}`} aria-live="polite">
+          <small>
+            {t('inicio.nivel', { n: escolhida.nivel })} · {t('trilha.fase', { n: escolhida.numero })}
+          </small>
+          <h3>{escolhida.texto.titulo}</h3>
+          {abertas.includes(escolhida) ? (
+            <>
+              <p>{escolhida.texto.resumo}</p>
+              <div className="ponto-modos">
+                {MODOS.map(({ modo, curto, borda }) => (
+                  <Link key={modo} className={`chip-modo ${borda}`} href={`/fase/${escolhida.id}/${modo}/`}>
+                    {t(curto)}
+                    <Estrelas quantas={progresso[escolhida.id]?.[modo]?.estrelas ?? 0} rotulo={t(curto)} />
+                  </Link>
+                ))}
+              </div>
+            </>
+          ) : (
+            <p>{t('inicio.trancada')}</p>
+          )}
+        </div>
+        <p className="fraco pequeno" style={{ marginTop: 12 }}>
+          {t('trilha.escolha')} {t('trilha.aCaminho', { n: TOTAL_DO_CATALOGO - fases.length })}: {t('trilha.aCaminhoTexto')}
+        </p>
       </section>
 
       <section className="faixa">

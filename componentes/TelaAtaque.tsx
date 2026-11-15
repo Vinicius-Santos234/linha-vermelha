@@ -5,9 +5,9 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { rodarNoWorker } from '../cliente/rodar-no-worker'
 import { banco } from '../jogo/banco'
 import { descrever } from '../jogo/descrever'
-import { faseDaTela } from '../jogo/fases'
+import { faseDaTela, rotaDe, rotaDeVolta } from '../jogo/fases'
 import { estrelasPara, registrarVitoria } from '../jogo/progresso'
-import type { PoliticasDaTabela, TabelaDoSchema } from '../jogo/protocolo-banco'
+import type { Definicao, FuncaoDoSchema, PoliticasDaTabela, TabelaDoSchema } from '../jogo/protocolo-banco'
 import { t } from '../jogo/t'
 import type { Chamada, RespostaCliente } from '../motor/chamada'
 import { Editor } from './Editor'
@@ -24,19 +24,23 @@ export function TelaAtaque({ id, ciclo }: { id: string; ciclo?: { aoAvancar(ataq
   const [estado, setEstado] = useState<'carregando' | 'pronta' | 'erro'>('carregando')
   const [erro, setErro] = useState('')
   const [schema, setSchema] = useState<TabelaDoSchema[]>([])
+  const [funcoes, setFuncoes] = useState<FuncaoDoSchema[]>([])
+  const [resposta, setResposta] = useState('')
+  const [errou, setErrou] = useState(false)
   const [codigo, setCodigo] = useState(t('ataque.inicial'))
   const [entradas, setEntradas] = useState<Entrada[]>([])
   const [executando, setExecutando] = useState(false)
   const [venceu, setVenceu] = useState(false)
   const [dicas, setDicas] = useState(0)
-  const [politicas, setPoliticas] = useState<PoliticasDaTabela[] | null>(null)
+  const [politicas, setPoliticas] = useState<{ tabelas: PoliticasDaTabela[]; definicoes: Definicao[] } | null>(null)
   const estrelas = estrelasPara(dicas)
 
   const abrir = useCallback(async () => {
     setEstado('carregando')
     try {
-      const { schema } = await banco.abrirAtaque(id)
+      const { schema, funcoes } = await banco.abrirAtaque(id)
       setSchema(schema)
+      setFuncoes(funcoes)
       setEntradas([])
       setVenceu(false)
       setEstado('pronta')
@@ -85,6 +89,17 @@ export function TelaAtaque({ id, ciclo }: { id: string; ciclo?: { aoAvancar(ataq
     setExecutando(false)
   }, [id])
 
+  // Fase de descobrir: o jogador informa o valor que deduziu.
+  const conferirResposta = async () => {
+    if (!resposta.trim() || estado !== 'pronta') return
+    const r = await banco.responder(resposta)
+    setErrou(!r.certo)
+    if (r.venceu) {
+      if (!ciclo) registrarVitoria(id, 'ataque', dicas)
+      setVenceu(true)
+    }
+  }
+
   const abrirDica = async () => {
     const proxima = dicas + 1
     setDicas(proxima)
@@ -93,7 +108,7 @@ export function TelaAtaque({ id, ciclo }: { id: string; ciclo?: { aoAvancar(ataq
 
   return (
     <>
-      <Topo faseId={id} titulo={`${fase.numero}. ${fase.texto.titulo}`} modo={ciclo ? 'ciclo' : 'ataque'} estrelas={estrelas} etapa={ciclo && t('ciclo.etapaAtaque')} />
+      <Topo faseId={id} titulo={fase.rotulo} modo={ciclo ? 'ciclo' : 'ataque'} estrelas={estrelas} etapa={ciclo && t('ciclo.etapaAtaque')} />
       <main className="fase">
         <div className="coluna">
           <section className="cartao borda-quente">
@@ -129,7 +144,44 @@ export function TelaAtaque({ id, ciclo }: { id: string; ciclo?: { aoAvancar(ataq
                 </ul>
               </div>
             ))}
+            {funcoes.length > 0 && (
+              <div>
+                <h3>{t('schema.funcoes')}</h3>
+                <ul>
+                  {funcoes.map((f) => (
+                    <li key={f.nome}>
+                      <span>{f.nome}</span>
+                      <span>({f.argumentos})</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </section>
+
+          {fase.pedeResposta && !venceu && (
+            <section className="cartao borda-quente">
+              <h2>{t('resposta.titulo')}</h2>
+              <p className="fraco pequeno">{t('resposta.texto')}</p>
+              <form
+                className="resposta"
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  void conferirResposta()
+                }}
+              >
+                <input value={resposta} onChange={(e) => setResposta(e.target.value)} aria-label={t('resposta.campo')} placeholder={t('resposta.campo')} autoComplete="off" spellCheck={false} />
+                <button className="botao borda-quente" disabled={estado !== 'pronta'}>
+                  {t('resposta.conferir')}
+                </button>
+              </form>
+              {errou && (
+                <p className="erro-texto" role="alert" style={{ marginTop: 10 }}>
+                  {t('resposta.errado')}
+                </p>
+              )}
+            </section>
+          )}
 
           <Dicas
             dicas={fase.texto.dicasDoAtaque}
@@ -155,11 +207,11 @@ export function TelaAtaque({ id, ciclo }: { id: string; ciclo?: { aoAvancar(ataq
                     {t('ciclo.avancar')}
                   </button>
                 ) : (
-                  <Link className="botao borda-fria" href={`/fase/${id}/defesa/`}>
+                  <Link className="botao borda-fria" href={rotaDe(id, 'defesa')}>
                     {t('vitoria.irParaDefesa')}
                   </Link>
                 )}
-                <Link className="botao-liso" href="/fases/">
+                <Link className="botao-liso" href={rotaDeVolta(id)}>
                   {t('vitoria.voltar')}
                 </Link>
               </div>
@@ -270,10 +322,10 @@ function Dados({ dados }: { dados: unknown }) {
   )
 }
 
-function Politicas({ politicas }: { politicas: PoliticasDaTabela[] }) {
+function Politicas({ politicas }: { politicas: { tabelas: PoliticasDaTabela[]; definicoes: Definicao[] } }) {
   return (
     <div className="politicas" style={{ marginTop: 12 }}>
-      {politicas.map((tabela) => (
+      {politicas.tabelas.map((tabela) => (
         <div key={tabela.tabela}>
           <h3>
             {tabela.tabela}
@@ -288,6 +340,12 @@ function Politicas({ politicas }: { politicas: PoliticasDaTabela[] }) {
                 .join('\n\n')}
             </pre>
           )}
+        </div>
+      ))}
+      {politicas.definicoes.map((d) => (
+        <div key={d.titulo}>
+          <h3>{d.titulo}</h3>
+          <pre>{d.sql}</pre>
         </div>
       ))}
     </div>

@@ -1,0 +1,15 @@
+[
+  {
+    "tipo": "auth",
+    "metodo": "signUp",
+    "email": "alice@padaria.com.br",
+    "senha": "qualquercoisa"
+  },
+  {
+    "tipo": "from",
+    "tabela": "fornecedores",
+    "operacao": "select",
+    "filtros": [],
+    "colunas": "*"
+  }
+]
