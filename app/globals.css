@@ -846,3 +846,9 @@ table.dados tr.escondida td { color: #5f6368; text-decoration: line-through; tex
 .botao-sair:hover { color: #fff; background: var(--superficie-2); }
 .botao-sair:disabled { opacity: 0.5; cursor: default; }
 .conta-cartao .botao-liso { margin-top: 4px; }
+
+/* O tesouro, quando todas as fases foram vencidas. */
+.ilha.tesouro.achado { --arte: #ffd98a; --arte-fundo: #2c2416; }
+.ilha.tesouro.achado .terra { border-color: var(--amarelo); border-style: solid; box-shadow: 0 0 0 9px rgba(253, 200, 48, 0.1), 0 0 50px -8px var(--amarelo); }
+.ilha.tesouro.achado .nome b { color: #fff; }
+.trilha { min-width: 800px; }

@@ -248,5 +248,17 @@
   "conta.entrando": "Abrindo o Google…",
   "conta.erro": "Não deu para entrar: {erro}",
   "conta.sair": "Sair",
-  "perfil.sair": "Sair da conta"
+  "perfil.sair": "Sair da conta",
+  "partida.semConsoleSql": "Esta fase não tem console SQL.",
+  "partida.sqlVazio": "Escreva um comando SQL.",
+  "partida.sqlLongo": "O comando é longo demais.",
+  "ataque.editorSql": "Relatório (SQL)",
+  "ataque.inicialSql": "-- Aqui o console é SQL: o seu comando roda no banco, com a conexão do backend.\n-- Um comando por vez. Ctrl + Enter executa.\n\nselect current_user\n",
+  "acesso.sql": "Nesta fase você já está logada no painel de relatórios, como a Alice.",
+  "mapa.peca.12": "terminal",
+  "mapa.peca.13": "teclado",
+  "mapa.tesouroFim": "o fim da linha",
+  "mapa.tesouroAchado": "você chegou ao fim da linha",
+  "lab.compartilhar": "Copiar link",
+  "lab.linkCopiado": "Link copiado"
 }

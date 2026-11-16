@@ -10,7 +10,7 @@ const peca = (desenho: ReactNode) => (
   </svg>
 )
 
-/** As onze peças, na ordem das fases. */
+/** As peças, uma por fase, na ordem das fases. */
 export const ARTES: ReactNode[] = [
   // 1. Pente de RAM
   peca(
@@ -149,6 +149,26 @@ export const ARTES: ReactNode[] = [
       <path className="t" d="M92 66 62 46" />
       <circle className="d" cx="92" cy="66" r="6" />
       <path className="t" d="M88 14h12M88 20h12" />
+    </>,
+  ),
+  // 12. Terminal
+  peca(
+    <>
+      <rect className="f" x="12" y="6" width="96" height="58" rx="5" />
+      <rect className="t" x="19" y="13" width="82" height="44" rx="2" />
+      <path className="d" d="M26 22l9 7-9 7z" />
+      <path className="t" d="M40 36h20M26 46h34" />
+      <path className="t" d="M48 64v9M72 64v9M36 74h48" />
+    </>,
+  ),
+  // 13. Teclado
+  peca(
+    <>
+      <rect className="f" x="6" y="20" width="108" height="46" rx="6" />
+      {vezes(3).map((l) =>
+        vezes(9).map((c) => <rect key={`${l}-${c}`} className={(l + c) % 4 === 0 ? 'd' : 't'} x={13 + c * 10.6} y={27 + l * 9.5} width="7.6" height="6.4" rx="1.2" />),
+      )}
+      <rect className="d" x="34" y="56" width="52" height="5" rx="1.5" />
     </>,
   ),
 ]

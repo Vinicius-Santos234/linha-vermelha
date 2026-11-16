@@ -1,0 +1,6 @@
+[
+  {
+    "tipo": "sql",
+    "texto": "select * from pedidos"
+  }
+]

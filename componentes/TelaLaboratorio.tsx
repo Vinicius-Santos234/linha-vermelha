@@ -10,6 +10,22 @@ import { Editor } from './Editor'
 import { Osciloscopio } from './fundos/Osciloscopio'
 import { Carregando, ErroDoJogo, Navegacao } from './Pecas'
 
+// O experimento vai no próprio endereço, depois do #: quem abre o link vê o mesmo SQL.
+// Nada passa por servidor.
+function codificar(texto: string): string {
+  let binario = ''
+  for (const b of new TextEncoder().encode(texto)) binario += String.fromCharCode(b)
+  return btoa(binario).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+function decodificar(codigo: string): string | null {
+  try {
+    const binario = atob(codigo.replace(/-/g, '+').replace(/_/g, '/'))
+    return new TextDecoder('utf-8', { fatal: true }).decode(Uint8Array.from(binario, (c) => c.charCodeAt(0)))
+  } catch {
+    return null
+  }
+}
+
 const valor = (v: unknown) => (v === null ? 'null' : typeof v === 'object' ? JSON.stringify(v) : String(v))
 
 /** O playground: sem objetivo e sem estrelas. Escolha o usuário e veja o que ele enxerga. */
@@ -19,10 +35,15 @@ export function TelaLaboratorio() {
   const [erro, setErro] = useState('')
   const [quem, setQuem] = useState('anon')
   const [vencidas, setVencidas] = useState<string[]>([])
+  const [copiado, setCopiado] = useState(false)
 
   useEffect(() => {
     const progresso = lerProgresso()
     setVencidas(fases.filter((f) => Object.keys(progresso[f.id] ?? {}).length > 0).map((f) => f.id))
+    // Um link compartilhado traz o experimento no endereço.
+    const doLink = /^#sql=(.+)$/.exec(location.hash)
+    const recebido = doLink ? decodificar(doLink[1]!) : null
+    if (recebido) setSql(recebido)
   }, [])
 
   const pedido = useRef(0)
@@ -45,6 +66,14 @@ export function TelaLaboratorio() {
     return () => clearTimeout(espera)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sql])
+
+  const compartilhar = async () => {
+    history.replaceState(null, '', `#sql=${codificar(sql)}`)
+    // Sem permissão de copiar, o link fica no endereço, para copiar à mão.
+    await navigator.clipboard?.writeText(location.href).catch(() => {})
+    setCopiado(true)
+    setTimeout(() => setCopiado(false), 2500)
+  }
 
   const usuarios = resultado?.usuarios ?? []
   const escolhido = usuarios.includes(quem) ? quem : (usuarios.at(-1) ?? 'anon')
@@ -82,6 +111,9 @@ export function TelaLaboratorio() {
                     </option>
                   ))}
               </select>
+              <button className="botao-liso" onClick={compartilhar}>
+                {copiado ? t('lab.linkCopiado') : t('lab.compartilhar')}
+              </button>
             </header>
             <Editor valor={sql} aoMudar={setSql} aoExecutar={() => void explorar(sql)} linguagem="sql" rotulo={t('lab.editor')} />
           </section>

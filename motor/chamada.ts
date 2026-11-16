@@ -48,7 +48,13 @@ export interface ChamadaResposta {
   valor: unknown
 }
 
-export type Chamada = ChamadaFrom | ChamadaRpc | ChamadaAuth | ChamadaResposta
+/** Um comando do console SQL do nível 4. */
+export interface ChamadaSql {
+  tipo: 'sql'
+  texto: unknown
+}
+
+export type Chamada = ChamadaFrom | ChamadaRpc | ChamadaAuth | ChamadaResposta | ChamadaSql
 
 /** O erro como o supabase-js entrega em `error`. */
 export interface ErroCliente {

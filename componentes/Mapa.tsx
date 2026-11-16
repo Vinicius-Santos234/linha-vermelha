@@ -14,20 +14,20 @@ type Ponto = [number, number]
 // desce em zigue-zague. O último ponto é o tesouro.
 const LARGO = {
   largura: 1200,
-  altura: 880,
-  ilha: 15,
+  altura: 900,
+  ilha: 13.2,
   pontos: [
-    [150, 160], [420, 115], [690, 175], [960, 130],
-    [1045, 410], [790, 445], [525, 400], [255, 455],
-    [165, 715], [440, 740], [725, 695], [1015, 725],
+    [115, 165], [360, 120], [605, 178], [850, 125], [1085, 170],
+    [985, 430], [745, 468], [505, 422], [265, 470],
+    [115, 728], [360, 760], [605, 712], [850, 755], [1085, 722],
   ] as Ponto[],
-  bussola: [90, 310] as Ponto,
+  bussola: [78, 452] as Ponto,
 }
 const ESTREITO = {
   largura: 400,
-  altura: 2050,
+  altura: 2390,
   ilha: 43,
-  pontos: Array.from({ length: 12 }, (_, i): Ponto => [i % 2 ? 285 : 115, 120 + i * 162]),
+  pontos: Array.from({ length: 14 }, (_, i): Ponto => [i % 2 ? 285 : 115, 120 + i * 162]),
   bussola: [330, 60] as Ponto,
 }
 
@@ -71,7 +71,9 @@ export function Mapa() {
 
   const partes = trechos(m.pontos)
   const inicio = `M${m.pontos[0]![0]} ${m.pontos[0]![1]}`
-  const ate = fases.indexOf(abertas.at(-1)!)
+  // Com todas as fases vencidas, a rota acende até o tesouro.
+  const tudoVencido = fases.every((f) => vencida(f.id))
+  const ate = tudoVencido ? fases.length : fases.indexOf(abertas.at(-1)!)
   const lugar = ([x, y]: Ponto): CSSProperties => ({ left: `${(x / m.largura) * 100}%`, top: `${(y / m.altura) * 100}%`, width: `${m.ilha}%` })
 
   return (
@@ -125,11 +127,11 @@ export function Mapa() {
             )
           })}
 
-          <div className="ilha tesouro forma-1" style={lugar(m.pontos.at(-1)!)}>
+          <div className={`ilha tesouro forma-1${tudoVencido ? ' achado' : ''}`} style={lugar(m.pontos.at(-1)!)}>
             <span className="terra">{TESOURO}</span>
             <span className="nome">
               <b>{t('mapa.tesouro')}</b>
-              <small>{t('mapa.tesouroTexto', { n: TOTAL_DO_CATALOGO - fases.length })}</small>
+              <small>{TOTAL_DO_CATALOGO > fases.length ? t('mapa.tesouroTexto', { n: TOTAL_DO_CATALOGO - fases.length }) : t(tudoVencido ? 'mapa.tesouroAchado' : 'mapa.tesouroFim')}</small>
             </span>
           </div>
         </div>

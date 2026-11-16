@@ -2,7 +2,7 @@
 // supabase-js falso, sabe quem está logado, traduz, executa e detecta o objetivo.
 import type { Transaction } from '@electric-sql/pglite'
 import { t } from '../mensagens/t'
-import { aindaNao, ErroDeChamada, type Chamada, type ChamadaAuth, type ChamadaFrom, type ChamadaRpc, type ErroCliente, type RespostaCliente } from './chamada'
+import { aindaNao, ErroDeChamada, type Chamada, type ChamadaAuth, type ChamadaFrom, type ChamadaRpc, type ChamadaSql, type ErroCliente, type RespostaCliente } from './chamada'
 import { ANON, executarEm, usuarioDe, type Sessao, type UsuarioDoBanco } from './sessao'
 import { paraErroSql } from './sql'
 import { traduzirFrom, traduzirRpc, traduzirSombra } from './tradutor'
@@ -49,6 +49,8 @@ export class Partida {
         return this.auth(tx, chamada)
       case 'resposta':
         return Promise.resolve(this.responder(chamada.valor))
+      case 'sql':
+        return this.sql(tx, chamada)
       default:
         throw new ErroDeChamada(t('partida.chamadaDesconhecida'), 'JOGO_CHAMADA_INVALIDA')
     }
@@ -98,6 +100,41 @@ export class Partida {
       chaves = linhas.map((l) => l[chave])
     }
     if (chaves.some((k) => String(k) === String(objetivo.id))) this.venceu = true
+  }
+
+  /**
+   * O console SQL do nível 4: um comando por vez, com a conexão e os claims que a fase
+   * declara. No modo 'consulta' o comando é embrulhado como subconsulta, e é o próprio
+   * Postgres que recusa tudo o que não for um SELECT: SET, DDL, escrita por CTE e dois
+   * comandos de uma vez.
+   */
+  private async sql(tx: Transaction, c: ChamadaSql): Promise<RespostaCliente> {
+    const cfg = this.sessao.fase.def.sql
+    if (!cfg) throw new ErroDeChamada(t('partida.semConsoleSql'), 'JOGO_CHAMADA_INVALIDA')
+    if (typeof c.texto !== 'string' || !c.texto.trim()) throw new ErroDeChamada(t('partida.sqlVazio'), 'JOGO_CHAMADA_INVALIDA')
+    if (c.texto.length > 8000) throw new ErroDeChamada(t('partida.sqlLongo'), 'JOGO_CHAMADA_INVALIDA')
+    const comando = c.texto.trim().replace(/;\s*$/, '')
+    const consulta = cfg.modo === 'consulta'
+    const r = await executarEm(tx, this.sessao.usuario(cfg.como), consulta ? `select * from (${comando}\n) as relatorio` : comando, [], {
+      papel: cfg.papel,
+      caminho: cfg.caminho,
+      somenteLeitura: consulta,
+    })
+    if (r.error) return { data: null, error: paraErroCliente(r.error) }
+    this.conferirProva(r.data ?? [])
+    await this.conferirEstado(tx)
+    return { data: r.data, error: null }
+  }
+
+  /** Objetivo de ler pelo console SQL: o valor que prova a linha-alvo apareceu no resultado? */
+  private conferirProva(linhas: Linha[]): void {
+    const objetivo = this.sessao.fase.def.objetivo
+    if (this.venceu || objetivo.tipo !== 'ler' || !objetivo.prova) return
+    const chave = regraDe(this.sessao.fase.def, objetivo.tabela).chave
+    const alvo = (this.sessao.verdade[objetivo.tabela] ?? []).find((l) => String(l[chave]) === String(objetivo.id))
+    const segredo = alvo?.[objetivo.prova]
+    if (segredo === undefined || segredo === null) return
+    if (linhas.some((l) => Object.values(l).some((v) => String(v) === String(segredo)))) this.venceu = true
   }
 
   /** A tabela do objetivo, ou uma view ou função declarada como outro caminho até ela. */

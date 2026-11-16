@@ -71,6 +71,15 @@ Se sentir falta de algum, é um bom sinal de que ele deve entrar numa próxima v
 - `update` e `delete` sem filtro são recusados, como no Supabase.
 - Só o schema `public` existe para o cliente, como na API do Supabase.
 
+## O console SQL do nível 4
+
+Nas fases do nível 4 o app tem um recurso de relatórios que roda SQL no servidor, com a conexão do backend. O console deixa de ser JavaScript: você escreve um comando SQL, e ele roda em seu nome.
+
+- Um comando por execução. Dois comandos de uma vez são recusados.
+- Dá para ler o catálogo do Postgres, como num banco de verdade: `pg_policies`, `pg_tables`, `pg_proc`.
+- Numa fase só de consulta, qualquer coisa que não seja um `SELECT` é recusada.
+- Você não consegue trocar a sua identidade: `set_config` é negado.
+
 ## Dicas e estrelas
 
 Cada fase vale três estrelas em cada modo. Cada dica aberta custa uma, e o mínimo é uma. A primeira dica diz onde olhar, a segunda revela as políticas e a terceira mostra a solução comentada.

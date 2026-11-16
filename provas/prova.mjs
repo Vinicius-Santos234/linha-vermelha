@@ -18,10 +18,11 @@ const logado = (sub) => ({ role: 'authenticated', claims: { sub, role: 'authenti
 async function executar(db, identidade, sql, params = []) {
   try {
     const res = await db.transaction(async (tx) => {
-      await tx.query(`set local role ${identidade.role}`)
+      // Os claims vão antes da troca de papel: só o motor pode chamar set_config.
       await tx.query(`select set_config('request.jwt.claims', $1, true)`, [
         JSON.stringify(identidade.claims),
       ])
+      await tx.query(`set local role ${identidade.role}`)
       return tx.query(sql, params)
     })
     return { data: res.rows, afetadas: res.affectedRows, error: null }

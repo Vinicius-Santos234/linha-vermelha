@@ -127,15 +127,32 @@ export class Sessao {
   }
 }
 
+export interface OpcoesDeExecucao {
+  /** O papel do Postgres. Padrão: anon ou authenticated, conforme o usuário. */
+  papel?: string
+  /** O search_path só desta chamada. */
+  caminho?: string
+  /** Recusa qualquer escrita. */
+  somenteLeitura?: boolean
+}
+
 /** O coração: uma chamada com a identidade de alguém, isolada num savepoint. */
-export async function executarEm(tx: Transaction, usuario: Usuario, sql: string, params: unknown[]): Promise<Resposta> {
-  const papel = usuario.anonimo ? 'anon' : 'authenticated'
+export async function executarEm(tx: Transaction, usuario: Usuario, sql: string, params: unknown[], opcoes: OpcoesDeExecucao = {}): Promise<Resposta> {
+  const papel = opcoes.papel ?? (usuario.anonimo ? 'anon' : 'authenticated')
   await tx.query('savepoint chamada')
   try {
-    await tx.query(`set local role ${ident(papel)}`)
+    // Os claims e o search_path são postos antes de trocar de papel: só o motor pode.
     await tx.query(`select set_config('request.jwt.claims', $1, true)`, [JSON.stringify(claimsDe(usuario))])
+    let caminhoAnterior: string | null = null
+    if (opcoes.caminho) {
+      caminhoAnterior = (await tx.query<{ c: string }>(`select current_setting('search_path') as c`)).rows[0]!.c
+      await tx.query(`select set_config('search_path', $1, true)`, [opcoes.caminho])
+    }
+    await tx.query(`set local role ${ident(papel)}`)
+    if (opcoes.somenteLeitura) await tx.query('set local transaction_read_only = on')
     const r = await tx.query<Linha>(sql, params)
     await tx.query('set local role none')
+    if (caminhoAnterior !== null) await tx.query(`select set_config('search_path', $1, true)`, [caminhoAnterior])
     await tx.query('release savepoint chamada')
     return { data: r.rows, afetadas: r.affectedRows ?? 0, error: null }
   } catch (e) {

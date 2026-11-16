@@ -101,11 +101,11 @@ try {
   await pagina.goto(`${origem}/fases/`)
   await pagina.getByRole('link', { name: 'Atacar' }).first().waitFor()
   checar('4. apagado o armazenamento do navegador, as estrelas voltam do Firestore', await ate(async () => (await estrelas(pagina)) === 3), `${await estrelas(pagina)} estrelas`)
-  checar('5. e a fase seguinte volta a estar liberada', (await pagina.locator('.ilha.trancada').count()) === 9)
+  checar('5. e a fase seguinte volta a estar liberada', (await pagina.locator('.ilha.trancada').count()) === 11)
 
   await pagina.goto(`${origem}/perfil/`)
   await pagina.locator('.conta-cartao button').waitFor({ timeout: 15000 })
-  checar('6a. o perfil mostra as estrelas, "Anônimo" e o botão de entrar', (await pagina.getByText('3 de 99 estrelas').isVisible()) && (await pagina.locator('.conta-cartao h3').innerText()) === 'Anônimo' && (await pagina.locator('.conta-cartao button').innerText()) === 'Entrar com Google')
+  checar('6a. o perfil mostra as estrelas, "Anônimo" e o botão de entrar', (await pagina.getByText('3 de 117 estrelas').isVisible()) && (await pagina.locator('.conta-cartao h3').innerText()) === 'Anônimo' && (await pagina.locator('.conta-cartao button').innerText()) === 'Entrar com Google')
 
   // Entrar com o Google sem sair da página: o botão do cabeçalho abre a janela do provedor.
   // No emulador de Auth essa janela é uma tela de contas de teste.
@@ -143,7 +143,7 @@ try {
   await pagina.locator('.botao-sair').click()
   await pagina.locator('.botao-entrar:not([disabled])').waitFor({ timeout: 20000 })
   checar('6h. sair devolve o cabeçalho a "Anônimo", com o botão de entrar', (await pagina.locator('.topo .conta-chip span').last().innerText()).trim() === 'Anônimo' && (await pagina.locator('.botao-sair').count()) === 0)
-  checar('6i. o navegador volta ao começo: sem estrelas, só a fase 1 aberta', (await estrelas(pagina)) === 0 && (await pagina.locator('.ilha.trancada').count()) === 10)
+  checar('6i. o navegador volta ao começo: sem estrelas, só a fase 1 aberta', (await estrelas(pagina)) === 0 && (await pagina.locator('.ilha.trancada').count()) === 12)
   const depoisDeSair = await documentos()
   checar('6j. o progresso continua intacto na conta, e nenhum documento novo foi criado', depoisDeSair.length === 1 && depoisDeSair[0].uid === conta.localId && depoisDeSair[0].texto.includes('01-rls-desligado') && (await contas()).length === 2, `${(await contas()).length} contas, ${depoisDeSair.length} documento`)
 

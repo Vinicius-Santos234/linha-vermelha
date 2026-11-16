@@ -14,6 +14,8 @@ export interface FaseDaTela {
   /** O nome que aparece no topo da tela: "4. Coluna sem vigia" ou "Desafio de 15/11 · Clínica Vida". */
   rotulo: string
   diario: boolean
+  /** 'sql' no nível 4: o jogador escreve SQL em vez de usar o cliente supabase. */
+  console: 'supabase-js' | 'sql'
   /** Fase de descobrir: a tela pede o valor deduzido em vez de esperar a linha aparecer. */
   pedeResposta: boolean
   acesso: { email: string; senha: string }
@@ -24,6 +26,11 @@ export interface FaseDaTela {
   sqlCompleto: string
 }
 
+// As senhas dos usuários das fases. No Laboratório elas não aparecem: com a da vítima
+// daria para entrar na conta dela nos outros modos da mesma fase.
+const SENHAS = ['paodequeijo', 'tR7#kq9!vLx2', 'Zx8$mNp2@wQ5']
+const semSenhas = (sql: string) => SENHAS.reduce((texto, senha) => texto.split(`'${senha}'`).join("'***'"), sql)
+
 function paraTela(p: PacoteDeFase, sufixo = ''): FaseDaTela {
   const texto = lerTexto(p.texto)
   const numero = Number.parseInt(p.def.id, 10)
@@ -33,12 +40,13 @@ function paraTela(p: PacoteDeFase, sufixo = ''): FaseDaTela {
     numero,
     rotulo: Number.isNaN(numero) ? `${texto.titulo}${sufixo}` : `${numero}. ${texto.titulo}`,
     diario: ehDiario(p.def.id),
+    console: p.def.console,
     pedeResposta: p.def.objetivo.tipo === 'descobrir',
     acesso: p.def.acesso,
     usuarios: p.def.usuarios,
     texto,
     defesaSql: p.politicasSql,
-    sqlCompleto: `${p.setupSql.trimEnd()}\n\n${p.politicasSql}`,
+    sqlCompleto: semSenhas(`${p.setupSql.trimEnd()}\n\n${p.politicasSql}`),
   }
 }
 

@@ -25,7 +25,7 @@ Não tem servidor do jogo, não tem banco de terceiros e não tem flag para copi
   <img src="docs/demo.gif" alt="O jogo rodando: a abertura com a cena animada, o ataque à fase 1, a defesa com a grade em vermelho, o conserto e o laboratório" width="100%">
 </p>
 
-> **Estado:** no ar em [linha-vermelha.vercel.app](https://linha-vermelha.vercel.app), com onze fases, quatro modos e um desafio novo por dia. O que vem depois está em [Roteiro](#roteiro).
+> **Estado:** no ar em [linha-vermelha.vercel.app](https://linha-vermelha.vercel.app), com treze fases, quatro modos e um desafio novo por dia. O que vem depois está em [Roteiro](#roteiro).
 
 ## Por que existe
 
@@ -73,8 +73,13 @@ Cada fase vale 3 estrelas por modo. Cada dica aberta custa uma: a primeira diz o
 | 9 | A função que confia no parâmetro | `SECURITY DEFINER` que recebe o id como argumento | De quem são os dados vem de `auth.uid()`, nunca do cliente |
 | 10 | Políticas que somam | Uma restrição criada como permissiva, que soma com OU | `AS RESTRICTIVE` |
 | 11 | Não vejo, mas sei que existe | O RLS esconde a linha, e o erro de valor único conta que ela existe | Restrições olham a tabela inteira |
+| | **Nível 4 · Acesso direto (console SQL)** | | |
+| 12 | O dono não obedece | O backend se conecta como o dono da tabela, e o dono ignora as políticas | `FORCE ROW LEVEL SECURITY` |
+| 13 | Sequestro de search_path | Uma função `SECURITY DEFINER` chama outra pelo nome curto | `SET search_path = ''` e nomes completos |
 
-Vencer uma fase em qualquer modo libera a seguinte. O nível 4, com console SQL, ainda não existe.
+Vencer uma fase em qualquer modo libera a seguinte.
+
+No nível 4 o console deixa de ser JavaScript: o app tem um recurso de relatórios que roda o seu SQL no servidor, um comando por vez. Dá para ler o catálogo do Postgres, mas não para trocar de identidade.
 
 Na fase 11 a linha nunca aparece: você deduz o valor com mil tentativas e o informa numa caixa de resposta.
 
@@ -101,7 +106,7 @@ A interface parte do tema escuro dos consoles de nuvem (a referência foi o cons
 - **Gradiente na borda e no texto, quase nunca no preenchimento.** Os cartões e botões são escuros por dentro, e só o contorno carrega a cor. O conteúdo continua legível, e a tela não vira um carnaval. As exceções são de propósito: o botão **Jogar** da abertura e os carimbos de vitória, que são as únicas coisas da tela pedindo para serem vistas primeiro.
 - **A abertura mostra o jogo em vez de descrevê-lo.** Um console se digita sozinho, traz o pedido que não devia, carimba "Você cruzou a linha", vira para a Defesa e fecha a grade. Quem chega entende a proposta em dez segundos, sem ler.
 - **Um mar de caracteres.** O fundo inteiro da abertura e do mapa é um mar em ASCII: cristas de `~`, `-` e `.` passando devagar num canvas escuro, com um `0` ou um `1` à deriva de vez em quando. É fundo de verdade: apagado o bastante para o texto passar por cima.
-- **O mapa de fases é um mapa do tesouro.** Cada fase é uma ilha em forma de peça de computador (pente de RAM, SSD, cooler, placa-mãe, CPU, placa de vídeo, fonte, roteador, chip, servidor, disco rígido), ligada à seguinte por uma rota pontilhada. A rota acende até onde você chegou, as ilhas trancadas ficam apagadas, e no fim dela está o X do tesouro: o nível 4, que ainda vem. No celular a rota desce em zigue-zague.
+- **O mapa de fases é um mapa do tesouro.** Cada fase é uma ilha em forma de peça de computador (pente de RAM, SSD, cooler, placa-mãe, CPU, placa de vídeo, fonte, roteador, chip, servidor, disco rígido), ligada à seguinte por uma rota pontilhada. As duas últimas são um terminal e um teclado. A rota acende até onde você chegou, as ilhas trancadas ficam apagadas, e no fim dela está o X do tesouro, que só acende com as treze fases vencidas. No celular a rota desce em zigue-zague.
 - **Um fundo para cada página, tirado do que ela faz.** Nenhuma página fica só com o fundo escuro, e nenhuma repete a de outra:
 
   | Página | Fundo | O que ele mostra |
@@ -192,7 +197,7 @@ Sem configuração, o progresso fica guardado no navegador. Para sincronizar com
 | `npm run typecheck` | Os tipos |
 | `npm run prova:node` · `prova:navegador` | O PGlite com RLS e sessão não-superusuário, em Node e num Web Worker. Rodar antes de trocar a versão do PGlite |
 | `npm run prova:jogador` | O Worker do jogador num navegador de verdade, com laço infinito e tudo |
-| `npm run prova:site` | O site exportado, jogado de ponta a ponta: as onze fases, os quatro modos e o desafio de hoje. Faz um build próprio, sem Firebase |
+| `npm run prova:site` | O site exportado, jogado de ponta a ponta: as treze fases, os quatro modos, o console SQL e o desafio de hoje. Faz um build próprio, sem Firebase |
 | `npm run prova:diario` | O desafio diário de um ano inteiro, dia por dia, contra o banco. Leva alguns minutos |
 | `npm run prova:regras` | As regras do Firestore, no emulador (precisa de Java 17 ou mais novo) |
 | `npm run prova:nuvem` | O progresso na nuvem, contra os emuladores de Auth e Firestore |
@@ -253,7 +258,8 @@ Os testes não deixam uma fase impossível ou com o gabarito errado ir adiante: 
 - [ ] Teste com jogadores de verdade, para calibrar as dicas
 - [x] As fases 2, 3 e 6 a 11
 - [x] Desafio diário gerado pela data
-- [ ] Nível 4, com console SQL: o dono que não obedece ao RLS e o sequestro de `search_path`
+- [x] Nível 4, com console SQL: o dono que não obedece ao RLS e o sequestro de `search_path`
+- [x] Laboratório com link compartilhável: o experimento vai no próprio endereço
 - [ ] Ranking com verificação no servidor, usando o mesmo motor
 - [ ] Inglês: os textos já estão separados por idioma
 

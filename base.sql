@@ -80,3 +80,8 @@ $$;
 
 revoke all on all functions in schema motor from public;
 grant execute on all functions in schema motor to jogador;
+
+-- Só o motor escreve em request.jwt.claims. Nos níveis 1 a 3 o jogador nem alcança
+-- set_config; no console SQL do nível 4 alcançaria, e poderia se passar por outra pessoa.
+revoke execute on function pg_catalog.set_config(text, text, boolean) from public;
+grant execute on function pg_catalog.set_config(text, text, boolean) to jogador;

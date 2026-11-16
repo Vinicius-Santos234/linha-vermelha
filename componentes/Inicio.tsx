@@ -113,6 +113,7 @@ export function Inicio() {
   const maximo = fases.length * MODOS.length * 3
   const abertas = fasesAbertas(progresso)
   const proximo = ondeContinuar(progresso)
+  const aCaminho = TOTAL_DO_CATALOGO - fases.length
   // Na trilha, o ponto escolhido começa sendo a fase em que o jogador parou.
   const escolhida = fases.find((f) => f.id === escolhidaId) ?? proximo?.fase ?? fases[0]!
   const desafio = data ? gerarDesafio(data) : null
@@ -206,17 +207,19 @@ export function Inicio() {
                 </li>
               )
             })}
-            <li className="ponto futuro">
-              <span className="no" title={t('trilha.aCaminho', { n: TOTAL_DO_CATALOGO - fases.length })}>
-                +{TOTAL_DO_CATALOGO - fases.length}
-              </span>
-            </li>
+            {aCaminho > 0 && (
+              <li className="ponto futuro">
+                <span className="no" title={t('trilha.aCaminho', { n: aCaminho })}>
+                  +{aCaminho}
+                </span>
+              </li>
+            )}
           </ol>
         </div>
 
         <CartaoDaFase fase={escolhida} aberta={abertas.includes(escolhida)} progresso={progresso} />
         <p className="fraco pequeno" style={{ marginTop: 12 }}>
-          {t('trilha.escolha')} {t('trilha.aCaminho', { n: TOTAL_DO_CATALOGO - fases.length })}: {t('trilha.aCaminhoTexto')}
+          {t('trilha.escolha')}{aCaminho > 0 ? ` ${t('trilha.aCaminho', { n: aCaminho })}: ${t('trilha.aCaminhoTexto')}` : ''}
         </p>
       </section>
 

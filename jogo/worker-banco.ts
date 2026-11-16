@@ -64,7 +64,9 @@ const banco: Banco = {
   async chamar(chamada) {
     if (!partida) throw new Error('A fase ainda não foi aberta.')
     const resposta = await partida.chamar(chamada)
-    return { resposta, venceu: partida.venceu, usuario: partida.usuario.nome }
+    // No console SQL quem fala é o usuário que a fase declara, e não quem logou pelo cliente.
+    const quem = chamada.tipo === 'sql' ? (sessao?.fase.def.sql?.como ?? partida.usuario.nome) : partida.usuario.nome
+    return { resposta, venceu: partida.venceu, usuario: quem }
   },
 
   async politicas() {

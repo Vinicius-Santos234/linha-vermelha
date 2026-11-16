@@ -40,6 +40,11 @@ export type Objetivo =
       id: string | number
       /** Outros caminhos que também entregam a linha: uma view ou uma função (rpc). */
       tambemPor?: string[]
+      /**
+       * No console SQL não dá para saber de que tabela veio cada resposta. A linha-alvo
+       * conta como lida quando o valor desta coluna dela aparece no resultado.
+       */
+      prova?: string
     }
   /** Vence quando a linha-alvo fica com `campo = valor` no banco. */
   | { tipo: 'alterar'; tabela: string; id: string | number; campo: string; valor: string | number | boolean | null }
@@ -56,10 +61,24 @@ export interface UsoLegitimo {
   espera?: 'sucesso' | 'linhas'
 }
 
+/** O console SQL do nível 4: um recurso do app que roda SQL com a conexão do backend. */
+export interface ConsoleSql {
+  /** O papel do Postgres com que a conexão do backend roda. */
+  papel: string
+  /** O usuário do app que está usando o recurso: os claims são os dele. */
+  como: string
+  /** 'consulta': só SELECT. 'livre': o que o papel conseguir fazer. */
+  modo: 'consulta' | 'livre'
+  /** O search_path da conexão, quando não é o padrão. */
+  caminho?: string
+}
+
 export interface DefinicaoFase {
   id: string
   nivel: 1 | 2 | 3 | 4
   console: 'supabase-js' | 'sql'
+  /** Nível 4: como o console SQL fala com o banco. */
+  sql?: ConsoleSql
   /** nome → papel na história. O nome é o começo do e-mail em auth.users (alice → alice@...). */
   usuarios: Record<string, PapelNaFase>
   /** O login que o briefing entrega ao jogador (o usuário 'voce'). */

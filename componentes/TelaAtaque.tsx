@@ -28,7 +28,8 @@ export function TelaAtaque({ id, ciclo }: { id: string; ciclo?: { aoAvancar(ataq
   const [funcoes, setFuncoes] = useState<FuncaoDoSchema[]>([])
   const [resposta, setResposta] = useState('')
   const [errou, setErrou] = useState(false)
-  const [codigo, setCodigo] = useState(t('ataque.inicial'))
+  const sqlConsole = fase.console === 'sql'
+  const [codigo, setCodigo] = useState(sqlConsole ? t('ataque.inicialSql') : t('ataque.inicial'))
   const [entradas, setEntradas] = useState<Entrada[]>([])
   const [executando, setExecutando] = useState(false)
   const [venceu, setVenceu] = useState(false)
@@ -56,8 +57,8 @@ export function TelaAtaque({ id, ciclo }: { id: string; ciclo?: { aoAvancar(ataq
   }, [abrir])
 
   // O valor mais novo sem recriar a função que o editor guarda.
-  const atual = useRef({ codigo, dicas, executando, estado, emCiclo: !!ciclo })
-  atual.current = { codigo, dicas, executando, estado, emCiclo: !!ciclo }
+  const atual = useRef({ codigo, dicas, executando, estado, emCiclo: !!ciclo, sqlConsole })
+  atual.current = { codigo, dicas, executando, estado, emCiclo: !!ciclo, sqlConsole }
 
   const executar = useCallback(async () => {
     if (atual.current.executando || atual.current.estado !== 'pronta') return
@@ -68,7 +69,20 @@ export function TelaAtaque({ id, ciclo }: { id: string; ciclo?: { aoAvancar(ataq
       setEntradas([...novas])
     }
     let ganhou = false
-    const resultado = await rodarNoWorker(
+    // No nível 4 não há código do jogador para isolar: o texto é um comando SQL, que vai
+    // direto ao motor.
+    const rodarSql = async () => {
+      try {
+        const chamada = { tipo: 'sql' as const, texto: atual.current.codigo }
+        const r = await banco.chamar(chamada)
+        mostrar({ tipo: 'chamada', texto: descrever(chamada), resposta: r.resposta, usuario: r.usuario })
+        if (r.venceu) ganhou = true
+        return { erro: null }
+      } catch (e) {
+        return { erro: (e as Error).message }
+      }
+    }
+    const resultado = await (atual.current.sqlConsole ? rodarSql() : rodarNoWorker(
       () => new Worker(new URL('../cliente/worker-jogador.ts', import.meta.url)),
       atual.current.codigo,
       {
@@ -80,7 +94,7 @@ export function TelaAtaque({ id, ciclo }: { id: string; ciclo?: { aoAvancar(ataq
           return r.resposta
         },
       },
-    )
+    ))
     if (resultado.erro) mostrar({ tipo: 'erro', texto: resultado.erro })
     if (ganhou) {
       // No Ciclo a conquista só é registrada no fim, depois do conserto.
@@ -126,6 +140,11 @@ export function TelaAtaque({ id, ciclo }: { id: string; ciclo?: { aoAvancar(ataq
               <dt>{t('acesso.senha')}</dt>
               <dd>{fase.acesso.senha}</dd>
             </dl>
+            {sqlConsole && (
+              <p className="fraco pequeno" style={{ marginTop: 10 }}>
+                {t('acesso.sql')}
+              </p>
+            )}
           </section>
 
           <section className="cartao schema">
@@ -222,7 +241,7 @@ export function TelaAtaque({ id, ciclo }: { id: string; ciclo?: { aoAvancar(ataq
 
           <section className="editor borda-quente">
             <header>
-              <h2>{t('ataque.editor')}</h2>
+              <h2>{sqlConsole ? t('ataque.editorSql') : t('ataque.editor')}</h2>
               <a className="botao-liso" href="/ajuda/" target="_blank" rel="noreferrer">
                 {t('ajuda.titulo')}
               </a>
@@ -234,7 +253,7 @@ export function TelaAtaque({ id, ciclo }: { id: string; ciclo?: { aoAvancar(ataq
                 <kbd>{t('ataque.atalho')}</kbd>
               </button>
             </header>
-            <Editor valor={codigo} aoMudar={setCodigo} aoExecutar={executar} linguagem="js" rotulo={t('ataque.editor')} />
+            <Editor valor={codigo} aoMudar={setCodigo} aoExecutar={executar} linguagem={sqlConsole ? 'sql' : 'js'} rotulo={sqlConsole ? t('ataque.editorSql') : t('ataque.editor')} />
           </section>
 
           <section className="cartao">

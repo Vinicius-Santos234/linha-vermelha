@@ -1,0 +1,10 @@
+[
+  {
+    "tipo": "sql",
+    "texto": "create function public.pode_ver(uuid) returns boolean language sql as 'select true'"
+  },
+  {
+    "tipo": "sql",
+    "texto": "select * from relatorio_de_pedidos()"
+  }
+]
