@@ -1,0 +1,105 @@
+{
+  "cenarios": {
+    "padaria": { "um": "order", "varios": "orders" },
+    "clinica": { "um": "appointment", "varios": "appointments" },
+    "academia": { "um": "workout sheet", "varios": "workout sheets" },
+    "escola": { "um": "report card", "varios": "report cards" },
+    "oficina": { "um": "quote", "varios": "quotes" },
+    "petshop": { "um": "booking", "varios": "bookings" },
+    "biblioteca": { "um": "loan", "varios": "loans" },
+    "hotel": { "um": "reservation", "varios": "reservations" }
+  },
+  "geral": {
+    "titulo": "Challenge for {dia}",
+    "data": "{mesNome} {d}",
+    "meses": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    "resumo": "{app}: a new flaw, the same for everyone, today only.",
+    "alvoDoBruno": "{Um} #{id} belongs to Bruno, and nobody else was meant to see it.",
+    "alvoDeVisitante": "{Um} #{id} belongs to someone with no account, and nobody was meant to see it through the app.",
+    "objetivo": "**Goal:** make {um} #{id} show up in a response in your console.",
+    "voce": "You're Alice, with a regular account on the **{app}** app.",
+    "defesa": "Fix it **without breaking the app**: {regra}",
+    "dica2": "This hint reveals the policies.",
+    "dica3Ataque": "The whole attack:",
+    "dica3Defesa": "The reference fix:",
+    "regraDono": "each person still sees, updates and deletes only what's theirs."
+  },
+  "familias": {
+    "rls-desligado": {
+      "contexto": "The **{app}** app went live in a rush. The {varios} all sit in one table, `{tabela}`, and nobody stopped to look at its security.",
+      "ataque1": "Start with the simplest thing: reading the `{tabela}` table. Do you really need to be signed in?",
+      "ataque2": "Notice what is **not** there. A table with RLS disabled filters no rows at all.",
+      "defesa0": "The `{tabela}` table never had RLS enabled.",
+      "defesa1": "It takes two things: enabling RLS and saying who can do what. Enabling it alone locks everyone out, owners included.",
+      "defesa2": "The policy compares the `user_id` column with whoever is calling, which is `auth.uid()`.",
+      "explicacao": "With RLS disabled Postgres filters nothing, and Supabase's default privileges let the public key read and write the whole table. The fix has two halves: `ENABLE ROW LEVEL SECURITY` starts denying everything, and the policy gives each person back only what's theirs."
+    },
+    "politica-provisoria": {
+      "contexto": "The **{app}** app has RLS enabled on `{tabela}`, where the {varios} live. Without a login, the table returns nothing.",
+      "ataque1": "RLS enabled doesn't mean RLS done right. What changes when you sign in before querying?",
+      "ataque2": "Read the `USING` condition. Does it compare anything with whoever is calling?",
+      "defesa0": "RLS is enabled, and still every account reads everything.",
+      "defesa1": "The problem is a single word: `true`. A condition that is always true filters nothing.",
+      "defesa2": "Replace `true` with a comparison between `user_id` and `auth.uid()`, in both `USING` and `WITH CHECK`.",
+      "explicacao": "`USING (true)` is the policy you write to get the prototype working, promising to come back later. For anyone signed in the effect is the same as RLS disabled, and creating an account is usually free."
+    },
+    "linhas-orfas": {
+      "contexto": "The **{app}** app also records {varios} for people with no account, in the `{tabela}` table. Those rows have an empty `user_id`, and the policy got a patch for them.",
+      "ataque1": "Look for the rows that belong to nobody. The client has a filter for empty values: `.is('column', null)`.",
+      "ataque2": "Notice the `OR`. Now think about what `auth.uid()` returns for someone who hasn't signed in.",
+      "defesa0": "The rows with no owner are leaking.",
+      "defesa1": "The `OR user_id IS NULL` was added so the ownerless rows would \"work\". Who do they need to work for?",
+      "defesa2": "Drop the `OR`. A row with no owner becomes invisible to the API, which is right: the server takes care of it.",
+      "explicacao": "The policy can't tell \"no owner\" from \"everyone's\". With `OR user_id IS NULL`, the condition became true for anybody, signed in or not. What has no owner is the server's responsibility."
+    },
+    "metadata-do-usuario": {
+      "contexto": "In the **{app}** app, a manager (`gerente`) sees everyone's {varios}, in the `{tabela}` table. Each person's role (`papel`) travels in the login token.",
+      "ataque1": "The token carries two blocks about you: `user_metadata` and `app_metadata`. One of them is yours to edit. Check with `supabase.auth.getUser()`.",
+      "ataque2": "See where the manager policy reads the role from, and remember `supabase.auth.updateUser`.",
+      "defesa0": "The policy reads the role from the wrong part of the token.",
+      "defesa1": "Only one word of the policy needs to change. Which of the token's two blocks can the user **not** alter?",
+      "defesa2": "Only the server writes `app_metadata`, and Carla already has the manager role there.",
+      "explicacao": "`user_metadata` exists for the user to store whatever they like, and the user changes it with `auth.updateUser`. A policy that reads permissions from there is asking the visitor whether they're the manager. Permissions come from `app_metadata`, which only the server writes."
+    },
+    "politicas-que-somam": {
+      "contexto": "The **{app}** app tightened its security: {varios}, in the `{tabela}` table, only show up for accounts with two-step verification. The team added a new policy, next to the per-owner one.",
+      "ataque1": "No trick needed. Your account is verified: sign in with it and read the whole table.",
+      "ataque2": "There are two policies, and both are permissive. Does Postgres require that **all** pass, or that **any** passes?",
+      "defesa0": "Both policies are right on their own. The problem is how Postgres combines them.",
+      "defesa1": "The second policy was written to restrict. There's a word in `CREATE POLICY` that tells Postgres so.",
+      "defesa2": "`AS RESTRICTIVE`. A restrictive policy has to pass **together** with some permissive one.",
+      "explicacao": "Permissive policies combine with **OR**: adding one never takes access away from anyone. The team meant \"owner **and** verified\" and wrote \"owner **or** verified\". To restrict, the policy has to be `AS RESTRICTIVE`.",
+      "regra": "each person sees only what's theirs, and only if the account is verified. Carla isn't yet: nothing of hers may show up, not even for her."
+    },
+    "coluna-sem-vigia": {
+      "contexto": "In the **{app}** app each person has a profile (the `perfis` table), and an admin sees everyone's {varios}, in the `{tabela}` table.",
+      "ataque1": "The `{tabela}` table is well protected. Look at `perfis`, and at what you can **update** in it.",
+      "ataque2": "The UPDATE policy on `perfis` checks **whose row it is**. Does it say anything about **which columns** may change?",
+      "defesa0": "The policies are almost right, which is why nobody noticed.",
+      "defesa1": "RLS decides which **rows** each person can reach. It says nothing about **columns**. Look for the Postgres mechanism that does.",
+      "defesa2": "Take away the API's right to update the whole table and give back only the column the client needs: `revoke` and `grant ... (column)`.",
+      "explicacao": "The UPDATE policy said, correctly, that each person only touches their own row in `perfis`. But the `is_admin` column lives in that row, and nothing said it couldn't change. Columns are decided by grants.",
+      "regra": "each person still sees what's theirs and changes their own name (`nome`) in the profile, and Carla, who is an admin, still sees everything."
+    },
+    "view-que-ignora-rls": {
+      "contexto": "In the **{app}** app, the `{tabela}` table, where the {varios} live, is protected by the book. For the home screen, someone built a summary on top of it.",
+      "ataque1": "Look at the schema: there's more than one thing to query. The client reads a view the same way it reads a table.",
+      "ataque2": "Notice what does **not** appear in the view's definition: no option saying whose permissions it runs with.",
+      "defesa0": "The table's policies are right. The leak comes from the view.",
+      "defesa1": "By default, a view queries its tables with the permissions of whoever created it. The RLS that applies is the creator's.",
+      "defesa2": "Since Postgres 15 there's a view option to flip that: `security_invoker`.",
+      "explicacao": "RLS applies to whoever queries the table. When the query goes through an ordinary view, the one querying is the view's owner, and the policies don't apply to it. With `security_invoker = true`, the view queries with the permissions of whoever called it.",
+      "regra": "the summary still exists and shows each person only what's theirs."
+    },
+    "funcao-que-confia-no-parametro": {
+      "contexto": "In the **{app}** app, the `{tabela}` table, where the {varios} live, is well protected. To build each person's history, the team wrote a function, called by the app with `supabase.rpc`.",
+      "ataque1": "The schema shows a function besides the tables. It takes an argument. Who picks its value?",
+      "ataque2": "Notice `SECURITY DEFINER`, and where the `uid` in the `WHERE` comes from. To find someone else's id, look for a public table that shows it.",
+      "defesa0": "The policies are right. The hole is the function, which goes over their heads.",
+      "defesa1": "`SECURITY DEFINER` makes the function run with the permissions of whoever created it. Inside it, the caller's RLS doesn't apply.",
+      "defesa2": "Two ways: the function uses `auth.uid()` instead of the argument, or it becomes `SECURITY INVOKER`.",
+      "explicacao": "A `SECURITY DEFINER` function is a door that opens with the owner's key. This one took an id and returned its rows, without checking who was calling. An argument coming from the client never decides **whose** data it is: that comes from `auth.uid()`.",
+      "regra": "the function still exists, and each person still sees their own history through it."
+    }
+  }
+}

@@ -79,27 +79,30 @@ const banco: Banco = {
              qual as usando, with_check as checando
         from pg_policies where schemaname = 'public' order by tablename, policyname`)
     // Além das políticas: como as views, as funções e as restrições foram criadas.
-    const definicoes = await sessao.db.query<{ titulo: string; sql: string }>(`
-      select 'view ' || c.relname as titulo,
+    const definicoes = await sessao.db.query<{ tipo: 'view' | 'funcao' | 'restricao'; nome: string; sql: string }>(`
+      select 'view' as tipo, c.relname as nome,
              'create view public.' || c.relname ||
              case when c.reloptions is null then '' else ' with (' || array_to_string(c.reloptions, ', ') || ')' end ||
              E' as\n' || pg_get_viewdef(c.oid) as sql
         from pg_class c where c.relnamespace = 'public'::regnamespace and c.relkind = 'v'
       union all
-      select 'função ' || p.proname, pg_get_functiondef(p.oid)
+      select 'funcao', p.proname, pg_get_functiondef(p.oid)
         from pg_proc p where p.pronamespace = 'public'::regnamespace
       union all
-      select 'restrição em ' || c.relname, 'alter table public.' || c.relname || ' add constraint ' || k.conname || ' ' || pg_get_constraintdef(k.oid)
+      select 'restricao', c.relname, 'alter table public.' || c.relname || ' add constraint ' || k.conname || ' ' || pg_get_constraintdef(k.oid)
         from pg_constraint k join pg_class c on c.oid = k.conrelid
        where c.relnamespace = 'public'::regnamespace and k.contype = 'u'
-       order by 1`)
+       order by 1, 2`)
     return {
       tabelas: tabelas.rows.map((linha): PoliticasDaTabela => ({
         tabela: linha.tabela,
         rlsLigado: linha.rls,
         politicas: politicas.rows.filter((p) => p.tabela === linha.tabela).map(({ tabela: _, ...resto }) => resto),
       })),
-      definicoes: definicoes.rows,
+      definicoes: definicoes.rows.map(({ tipo, nome, sql }) => ({
+        titulo: tipo === 'view' ? `view ${nome}` : t(tipo === 'funcao' ? 'definicao.funcao' : 'definicao.restricao', { nome }),
+        sql,
+      })),
     }
   },
 

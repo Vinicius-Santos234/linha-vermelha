@@ -16,7 +16,7 @@ export default defineFase({
   },
   usos: [
     {
-      nome: 'alice continua vendo o próprio histórico pela função',
+      nome: 'uso.historicoPelaFuncao',
       como: 'alice',
       chamada: { tipo: 'rpc', nome: 'pedidos_do_usuario', args: { uid: 'a11ce000-0000-4000-8000-000000000001' } },
       espera: 'linhas',

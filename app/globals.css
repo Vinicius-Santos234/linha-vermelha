@@ -845,6 +845,7 @@ table.dados tr.escondida td { color: #5f6368; text-decoration: line-through; tex
 .botao-sair { min-height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--borda); background: transparent; color: var(--texto-3); font: 600 13px var(--sans); cursor: pointer; white-space: nowrap; }
 .botao-sair:hover { color: #fff; background: var(--superficie-2); }
 .botao-sair:disabled { opacity: 0.5; cursor: default; }
+.troca-idioma { display: inline-flex; align-items: center; letter-spacing: 0.04em; }
 .conta-cartao .botao-liso { margin-top: 4px; }
 
 /* O tesouro, quando todas as fases foram vencidas. */

@@ -1,1 +1,1 @@
-export { t, type Chave } from '../mensagens/t'
+export { escolher, idioma, t, type Chave, type Idioma } from '../mensagens/t'

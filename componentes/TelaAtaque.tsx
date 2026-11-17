@@ -242,9 +242,9 @@ export function TelaAtaque({ id, ciclo }: { id: string; ciclo?: { aoAvancar(ataq
           <section className="editor borda-quente">
             <header>
               <h2>{sqlConsole ? t('ataque.editorSql') : t('ataque.editor')}</h2>
-              <a className="botao-liso" href="/ajuda/" target="_blank" rel="noreferrer">
+              <Link className="botao-liso" href="/ajuda/" target="_blank" rel="noreferrer">
                 {t('ajuda.titulo')}
-              </a>
+              </Link>
               <button className="botao-liso" onClick={abrir} disabled={executando}>
                 {t('ataque.recomecar')}
               </button>

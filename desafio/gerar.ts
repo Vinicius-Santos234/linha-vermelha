@@ -4,6 +4,9 @@
 // todo mundo, sem servidor.
 import type { Chamada } from '../motor/chamada'
 import type { DefinicaoFase, Regra } from '../motor/tipos'
+import { SECOES } from '../jogo/texto'
+import { escolher, idioma } from '../mensagens/t'
+import conteudoEn from './conteudo.en.json'
 import conteudo from './conteudo.pt-BR.json'
 
 export const FAMILIAS = [
@@ -32,7 +35,7 @@ export interface Desafio {
   solucaoSql: string
   /** O ataque de referência, já como chamadas. */
   ataque: Chamada[]
-  /** No mesmo formato do pt-BR.md das fases fixas. */
+  /** No mesmo formato do pt-BR.md das fases fixas, no idioma do build. */
   texto: string
 }
 
@@ -379,7 +382,7 @@ insert into public.avaliacoes (id, user_id, nome, texto) values
       solucaoSql: politicas('invoker'),
       gabarito: { [c.tabela]: { ler: dono, alterar: dono, apagar: dono }, avaliacoes: { ler: () => true } },
       objetivo: { tipo: 'ler', tabela: c.tabela, id: alvo.id, tambemPor: [funcao] },
-      usos: [{ nome: `alice continua vendo o próprio histórico pela função`, como: 'alice', chamada: { tipo: 'rpc', nome: funcao, args: { uid: ALICE } }, espera: 'linhas' }],
+      usos: [{ nome: 'uso.historicoPelaFuncao', como: 'alice', chamada: { tipo: 'rpc', nome: funcao, args: { uid: ALICE } }, espera: 'linhas' }],
       ataque: [
         ENTRAR,
         { tipo: 'from', tabela: 'avaliacoes', operacao: 'select', colunas: 'user_id', filtros: [{ coluna: 'nome', op: 'eq', valor: 'Bruno' }], unica: 'single' },
@@ -391,6 +394,10 @@ insert into public.avaliacoes (id, user_id, nome, texto) values
 }
 
 // ---------- o gerador ----------
+
+/** Os textos do desafio no idioma do build. Os cenários ficam fora: são dados. */
+type Textos = Pick<typeof conteudo, 'geral' | 'familias'>
+const textos = () => escolher<Textos>({ 'pt-BR': conteudo, en: conteudoEn })
 
 const preencher = (modelo: string, valores: Record<string, string | number>) => modelo.replace(/\{(\w+)\}/g, (_, nome: string) => String(valores[nome] ?? `{${nome}}`))
 const maiuscula = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
@@ -417,28 +424,32 @@ export function gerarDesafio(data: string, forcar: { familia?: Familia; cenario?
   alvo.b = segredo[1]
 
   const pecas = RECEITAS[familia](cenario, linhas, alvo)
-  const f = conteudo.familias[familia]
-  const g = conteudo.geral
-  const [, mes, dia] = data.split('-')
-  const v = { app: cenario.app, tabela: cenario.tabela, um: cenario.um, Um: maiuscula(cenario.um), varios: cenario.varios, Varios: maiuscula(cenario.varios), id: alvo.id, dia: `${dia}/${mes}` }
+  const f = textos().familias[familia]
+  const g = textos().geral
+  const [, mes, dia] = data.split('-') as [string, string, string]
+  const quando = preencher(g.data, { dd: dia, mm: mes, d: Number(dia), mesNome: (g as { meses?: string[] }).meses?.[Number(mes) - 1] ?? mes })
+  // Os dados do cenário (app, tabela, linhas) são os mesmos em todo idioma. Só muda como o texto os chama.
+  const { um, varios } = idioma() === 'en' ? conteudoEn.cenarios[cenario.id as keyof typeof conteudoEn.cenarios] : cenario
+  const v = { app: cenario.app, tabela: cenario.tabela, um, Um: maiuscula(um), varios, Varios: maiuscula(varios), id: alvo.id, dia: quando }
   const regra = 'regra' in f ? f.regra : g.regraDono
 
+  const s = SECOES[idioma()]
   const texto = `# ${preencher(g.titulo, v)}
 
-## Resumo
+## ${s.resumo}
 ${preencher(g.resumo, v)}
 
-## Briefing do ataque
+## ${s.briefingDoAtaque}
 ${preencher(f.contexto, v)}
 
 ${preencher(g.voce, v)} ${preencher(pecas.alvoDeVisitante ? g.alvoDeVisitante : g.alvoDoBruno, v)}
 
 ${preencher(g.objetivo, v)}
 
-## Briefing da defesa
+## ${s.briefingDaDefesa}
 ${preencher(f.defesa0, v)} ${preencher(g.defesa, { ...v, regra })}
 
-## Dicas do ataque
+## ${s.dicasDoAtaque}
 1. ${preencher(f.ataque1, v)}
 
 2. ${g.dica2} ${preencher(f.ataque2, v)}
@@ -449,7 +460,7 @@ ${preencher(f.defesa0, v)} ${preencher(g.defesa, { ...v, regra })}
 ${pecas.ataqueJs}
 \`\`\`
 
-## Dicas da defesa
+## ${s.dicasDaDefesa}
 1. ${preencher(f.defesa1, v)}
 
 2. ${preencher(f.defesa2, v)}
@@ -460,7 +471,7 @@ ${pecas.ataqueJs}
 ${pecas.solucaoSql.trim()}
 \`\`\`
 
-## Explicação
+## ${s.explicacao}
 ${preencher(f.explicacao, v)}
 `
 

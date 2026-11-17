@@ -1,4 +1,4 @@
-import { t, type Chave } from '../mensagens/t'
+import { t, tSeHouver, type Chave } from '../mensagens/t'
 import type { Chamada } from './chamada'
 import { montarGrade } from './grade'
 import { Partida, reproduzirAtaque } from './partida'
@@ -131,7 +131,7 @@ export async function rodarBateria(sessao: Sessao, ataques: AtaqueNomeado[] = []
     const vazio = uso.espera === 'linhas' && !(Array.isArray(r.data) && r.data.length > 0)
     testes.push({
       tipo: 'uso',
-      nome: uso.nome,
+      nome: tSeHouver(uso.nome),
       ok: !r.error && !vazio,
       detalhe: r.error ? r.error.message : vazio ? t('bateria.uso.vazio') : t('bateria.uso.ok'),
     })

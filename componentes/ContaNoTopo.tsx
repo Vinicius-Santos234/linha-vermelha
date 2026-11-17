@@ -1,8 +1,9 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import type { Conta } from '../jogo/conta'
-import { t } from '../jogo/t'
+import { idioma, t } from '../jogo/t'
 import { usarConta } from './usarConta'
 
 /** A foto da conta. Sem foto (ou anônimo), um círculo com a inicial ou com a silhueta. */
@@ -30,12 +31,28 @@ export function Avatar({ conta, tamanho = 28 }: { conta: Conta | null; tamanho?:
   )
 }
 
+/**
+ * O link para a mesma página no outro idioma. O inglês é outro build do site, servido em
+ * /en/, então é um link comum, que recarrega a página: o <Link> do Next ficaria preso ao
+ * idioma atual. O progresso é o mesmo nos dois, porque mora no navegador e na conta.
+ */
+export function TrocaDeIdioma() {
+  const caminho = usePathname()
+  const ingles = idioma() === 'en'
+  return (
+    <a className="botao-sair troca-idioma" href={ingles ? caminho : `/en${caminho}`} hrefLang={ingles ? 'pt-BR' : 'en'} lang={ingles ? 'pt-BR' : 'en'} title={t('idioma.trocarTitulo')} aria-label={t('idioma.trocar')}>
+      {ingles ? 'PT' : 'EN'}
+    </a>
+  )
+}
+
 /** A conta no cabeçalho: anônimo com o botão de entrar ali mesmo, ou a foto e o nome. */
 export function ContaNoTopo() {
   const { conta, configurada, entrando, erro, entrar, sair } = usarConta()
   const logado = conta !== null && !conta.anonima
   return (
     <div className="conta-no-topo">
+      <TrocaDeIdioma />
       <Link className="conta-chip" href="/perfil/" title={t('perfil.titulo')}>
         <Avatar conta={conta} />
         <span>{logado ? (conta.nome ?? conta.email) : t('conta.anonimo')}</span>

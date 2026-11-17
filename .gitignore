@@ -7,6 +7,7 @@ provas/.saida/
 !.env.example
 out-emulador/
 out-prova/
+out*-en/
 *-debug.log
 public/pglite-*/
 jogo/fases.gerado.ts

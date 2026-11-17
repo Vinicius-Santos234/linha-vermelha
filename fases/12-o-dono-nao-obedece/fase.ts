@@ -17,7 +17,7 @@ export default defineFase({
   },
   usos: [
     {
-      nome: 'o relatório da alice continua trazendo os pedidos dela',
+      nome: 'uso.relatorio',
       como: 'alice',
       chamada: { tipo: 'sql', texto: 'select id, itens from pedidos' },
       espera: 'linhas',

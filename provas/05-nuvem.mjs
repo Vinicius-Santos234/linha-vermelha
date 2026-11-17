@@ -20,6 +20,8 @@ const build = spawnSync('npm', ['run', 'build'], {
   encoding: 'utf8',
   env: {
     ...process.env,
+    // Esta prova só joga em português.
+    SO_PT: '1',
     SAIDA,
     NEXT_PUBLIC_FIREBASE_API_KEY: 'chave-de-mentira',
     NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: `${PROJETO}.firebaseapp.com`,

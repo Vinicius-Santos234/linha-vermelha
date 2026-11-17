@@ -1,4 +1,26 @@
-// Lê o pt-BR.md de uma fase. O formato é fixo: um título e seções "## Nome".
+// Lê o texto de uma fase (pt-BR.md ou en.md). O formato é fixo: um título e seções "## Nome".
+import type { Idioma } from '../mensagens/t'
+
+/** O nome de cada seção em cada idioma. */
+export const SECOES: Record<Idioma, Record<Exclude<keyof TextoDaFase, 'titulo'>, string>> = {
+  'pt-BR': {
+    resumo: 'Resumo',
+    briefingDoAtaque: 'Briefing do ataque',
+    briefingDaDefesa: 'Briefing da defesa',
+    dicasDoAtaque: 'Dicas do ataque',
+    dicasDaDefesa: 'Dicas da defesa',
+    explicacao: 'Explicação',
+  },
+  en: {
+    resumo: 'Summary',
+    briefingDoAtaque: 'Attack briefing',
+    briefingDaDefesa: 'Defense briefing',
+    dicasDoAtaque: 'Attack hints',
+    dicasDaDefesa: 'Defense hints',
+    explicacao: 'Explanation',
+  },
+}
+
 export interface TextoDaFase {
   titulo: string
   resumo: string
@@ -17,15 +39,17 @@ export function lerTexto(markdown: string): TextoDaFase {
     const quebra = parte.indexOf('\n')
     secoes.set(parte.slice(0, quebra).trim().toLowerCase(), parte.slice(quebra + 1).trim())
   }
-  const secao = (nome: string) => secoes.get(nome) ?? ''
+  // Uma seção vale pelo nome em qualquer idioma: o arquivo diz em que língua está.
+  const secao = (qual: Exclude<keyof TextoDaFase, 'titulo'>) =>
+    secoes.get(SECOES['pt-BR'][qual].toLowerCase()) ?? secoes.get(SECOES.en[qual].toLowerCase()) ?? ''
   return {
     titulo,
     resumo: secao('resumo'),
-    briefingDoAtaque: secao('briefing do ataque'),
-    briefingDaDefesa: secao('briefing da defesa'),
-    dicasDoAtaque: itens(secao('dicas do ataque')),
-    dicasDaDefesa: itens(secao('dicas da defesa')),
-    explicacao: secao('explicação'),
+    briefingDoAtaque: secao('briefingDoAtaque'),
+    briefingDaDefesa: secao('briefingDaDefesa'),
+    dicasDoAtaque: itens(secao('dicasDoAtaque')),
+    dicasDaDefesa: itens(secao('dicasDaDefesa')),
+    explicacao: secao('explicacao'),
   }
 }
 

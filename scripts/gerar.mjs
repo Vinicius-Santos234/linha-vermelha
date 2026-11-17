@@ -1,5 +1,5 @@
 // Prepara o que o site precisa e que não depende de empacotador (D15):
-// 1. jogo/fases.gerado.ts: o pacote de fases como texto (base.sql, setup.sql, pt-BR.md,
+// 1. jogo/fases.gerado.ts: o pacote de fases como texto (base.sql, setup.sql, pt-BR.md, en.md,
 //    politicas.sql e o ataque já gravado como chamadas). O ataque.ts e o solucao.sql
 //    ficam de fora: são só dos testes.
 // 2. public/pglite-<versão>/: o PGlite como arquivo estático, carregado só dentro do
@@ -25,12 +25,13 @@ const linhas = [
   '// GERADO por scripts/gerar.mjs. Não editar: mude os arquivos em fases/ e rode `npm run gerar`.',
   "import type { Chamada } from '../motor/chamada'",
   "import type { DefinicaoFase } from '../motor/tipos'",
+  "import { escolher } from '../mensagens/t'",
   ...pastas.map((p, i) => `import def${i} from '../fases/${p}/fase'`),
   '',
   'export interface PacoteDeFase {',
   '  def: DefinicaoFase',
   '  setupSql: string',
-  '  /** O pt-BR.md da fase: briefings, dicas e explicação. */',
+  '  /** O texto da fase (pt-BR.md ou en.md, conforme o idioma do build): briefings, dicas e explicação. */',
   '  texto: string',
   '  /** As políticas furadas: rodam no Ataque e são o que o editor da Defesa mostra ao abrir. */',
   '  politicasSql: string',
@@ -40,20 +41,20 @@ const linhas = [
   '',
   `export const versaoPGlite = ${JSON.stringify(versaoPGlite)}`,
   `export const baseSql = ${JSON.stringify(await ler('base.sql'))}`,
-  '/** O texto da página de ajuda (mensagens/ajuda.pt-BR.md). */',
-  `export const ajuda = ${JSON.stringify(await ler('mensagens/ajuda.pt-BR.md'))}`,
+  '/** O texto da página de ajuda (mensagens/ajuda.<idioma>.md). */',
+  `export const ajuda = escolher({ 'pt-BR': ${JSON.stringify(await ler('mensagens/ajuda.pt-BR.md'))}, en: ${JSON.stringify(await ler('mensagens/ajuda.en.md'))} })`,
   '',
   'export const pacotes: PacoteDeFase[] = [',
 ]
 for (const [i, p] of pastas.entries()) {
-  for (const obrigatorio of ['setup.sql', 'politicas.sql', 'pt-BR.md', 'ataque.gravado.json']) {
+  for (const obrigatorio of ['setup.sql', 'politicas.sql', 'pt-BR.md', 'en.md', 'ataque.gravado.json']) {
     if (!existsSync(join(raiz, 'fases', p, obrigatorio))) throw new Error(`fases/${p}: falta o ${obrigatorio}`)
   }
   linhas.push(
     '  {',
     `    def: def${i},`,
     `    setupSql: ${JSON.stringify(await ler('fases', p, 'setup.sql'))},`,
-    `    texto: ${JSON.stringify(await ler('fases', p, 'pt-BR.md'))},`,
+    `    texto: escolher({ 'pt-BR': ${JSON.stringify(await ler('fases', p, 'pt-BR.md'))}, en: ${JSON.stringify(await ler('fases', p, 'en.md'))} }),`,
     `    politicasSql: ${JSON.stringify(await ler('fases', p, 'politicas.sql'))},`,
     `    ataqueGravado: ${JSON.stringify(JSON.parse(await ler('fases', p, 'ataque.gravado.json')))},`,
     '  },',

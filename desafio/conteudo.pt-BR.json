@@ -43,6 +43,7 @@
   ],
   "geral": {
     "titulo": "Desafio de {dia}",
+    "data": "{dd}/{mm}",
     "resumo": "{app}: uma falha nova, igual para todo mundo, só hoje.",
     "alvoDoBruno": "{Um} #{id} é do Bruno, e não era para mais ninguém ver.",
     "alvoDeVisitante": "{Um} #{id} é de uma pessoa sem conta, e não era para ninguém ver pelo app.",

@@ -1,6 +1,7 @@
 // O lado da tela do Worker do banco. O Worker (e com ele o PGlite) só é criado no
 // primeiro pedido, ou seja, quando o jogador entra numa fase.
 import type { Banco, Pedido, Retorno } from './protocolo-banco'
+import { t } from './t'
 
 let worker: Worker | null = null
 let proximoId = 1
@@ -16,7 +17,7 @@ function pegarWorker(): Worker {
     else espera?.rejeitar(new Error(data.erro))
   }
   worker.onerror = (e) => {
-    for (const espera of esperando.values()) espera.rejeitar(new Error(e.message || 'O banco do jogo não carregou.'))
+    for (const espera of esperando.values()) espera.rejeitar(new Error(e.message || t('comum.bancoNaoCarregou')))
     esperando.clear()
     worker = null
   }

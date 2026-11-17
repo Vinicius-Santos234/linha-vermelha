@@ -1,6 +1,6 @@
 // Prova do site de ponta a ponta: faz um build próprio, SEM Firebase, serve a pasta
 // exportada como um host estático qualquer, joga as fases num navegador de verdade e
-// guarda capturas de tela. O build à parte existe para a prova nunca tocar no Firebase
+// guarda capturas de tela. O build sai nos dois idiomas, e o inglês é jogado em /en/. O build à parte existe para a prova nunca tocar no Firebase
 // de verdade, mesmo com o .env.local preenchido. Uso: npm run prova:site
 import { spawnSync } from 'node:child_process'
 import { createServer } from 'node:http'
@@ -259,6 +259,10 @@ await supabase.from('pedidos').select()`)
     for (const n of [1, 2, 3]) await pagina.getByRole('button', { name: `Abrir dica ${n}` }).click()
     return pagina.locator('.dica').last().locator('pre').last().innerText()
   }
+  const dica3En = async () => {
+    for (const n of [1, 2, 3]) await pagina.getByRole('button', { name: `Open hint ${n}` }).click()
+    return pagina.locator('.dica').last().locator('pre').last().innerText()
+  }
   const abrirAtaque = async (caminho) => {
     await pagina.goto(`${origem}${caminho}`)
     await pagina.getByText('As respostas do app aparecem aqui.').waitFor({ timeout: 60000 })
@@ -395,6 +399,57 @@ await supabase.from('pedidos').select()`)
   await pagina.getByRole('button', { name: 'Abrir dica 2' }).click()
   checar('7i. a dica 2 da fase 1 fala da chave pública e das Rules do Firebase', (await pagina.getByText('pública por design').count()) > 0)
   checar('7j. sem Firebase configurado, a prova não fala com nenhum servidor de fora', deFora.size === 0, [...deFora].join(', '))
+
+  // ---------- Inglês: o mesmo site, construído de novo e servido em /en/ ----------
+  await pagina.goto(`${origem}/`)
+  await pagina.locator('a.troca-idioma').first().waitFor()
+  checar('15a. o cabeçalho em português leva à mesma página em inglês', (await pagina.locator('a.troca-idioma').first().getAttribute('href')) === '/en/' && (await pagina.locator('html').getAttribute('lang')) === 'pt-BR')
+  await pagina.locator('a.troca-idioma').first().click()
+  await pagina.locator('a.jogar').waitFor()
+  checar('15b. /en/ abre em inglês, com o nome Red-Line (Security)', (await pagina.locator('html').getAttribute('lang')) === 'en' && (await pagina.title()).startsWith('Red-Line (Security)') && (await pagina.locator('h1.logo-jogo').innerText()).replace(/\s+/g, ' ').includes('Red-Line (Security)') && (await pagina.getByText('Break into the app.').count()) === 1)
+  checar('15c. o progresso é o mesmo nos dois idiomas', (await pagina.locator('a.jogar').innerText()).includes('Continue') && (await pagina.locator('a.jogar').innerText()).includes('Level 1 · Full cycle'), (await pagina.locator('a.jogar').innerText()).replace(/\n/g, ' '))
+  checar('15d. e os links ficam dentro de /en/', (await pagina.locator('a.jogar').getAttribute('href')) === '/en/fase/01-rls-desligado/ciclo/' && (await pagina.locator('a.troca-idioma').first().getAttribute('href')) === '/')
+  await pagina.goto(`${origem}/en/fases/`)
+  await pagina.getByRole('link', { name: 'Attack' }).first().waitFor()
+  checar('15e. o mapa em inglês mostra as 13 fases traduzidas', (await pagina.locator('.mapa-painel h3').innerText()) === 'RLS disabled' && (await pagina.locator('.mapa button.ilha').count()) === 13 && (await pagina.locator('.mapa').innerText()).includes('search_path hijacking'))
+  await pagina.goto(`${origem}/en/fase/01-rls-desligado/ataque/`)
+  await pagina.getByText("The app's responses show up here.").waitFor({ timeout: 60000 })
+  checar('15f. a fase abre em inglês, com o briefing traduzido e os dados do app como são', (await pagina.locator('main').innerText()).includes('surprise party') && (await pagina.locator('.schema').innerText()).includes('pedidos'))
+  await escrever(`await supabase.from('pedidos').select().range(0, 9)`)
+  await pagina.keyboard.press('Control+Enter')
+  await pagina.getByText('not in this game yet').waitFor()
+  checar('15g. o Worker do jogador também fala inglês, e o atalho da ajuda fica em /en/', (await pagina.locator('.saida').innerText()).includes('Help page') && (await pagina.getByRole('link', { name: 'Help' }).getAttribute('href')) === '/en/ajuda/')
+  await escrever(await dica3En())
+  await pagina.keyboard.press('Control+Enter')
+  checar('15h. o ataque da dica 3 em inglês vence', await pagina.getByText('You crossed the line').waitFor({ timeout: 20000 }).then(() => true, () => false))
+  await pagina.getByRole('link', { name: 'Now fix it' }).click()
+  await pagina.locator('table.grade td.errado').first().waitFor({ timeout: 60000 })
+  await escrever('alter table public.pedidos enable row level security;')
+  await pagina.waitForFunction(() => document.querySelectorAll('table.grade td.errado').length === 4)
+  const rodarEmIngles = async () => {
+    const botao = pagina.getByRole('button', { name: /Run tests/ })
+    await botao.click()
+    await pagina.getByRole('button', { name: /Testing/ }).waitFor({ timeout: 5000 }).catch(() => {})
+    await botao.waitFor({ timeout: 60000 })
+  }
+  await rodarEmIngles()
+  const falhasEmIngles = await pagina.locator('.testes li.falhou').allInnerTexts()
+  checar('15i. a bateria, que roda no Worker do banco, reprova em inglês', falhasEmIngles.length > 0 && falhasEmIngles.every((f) => f.includes('can still')), falhasEmIngles[0]?.replace(/\n/g, ' '))
+  await escrever(SOLUCAO)
+  await rodarEmIngles()
+  checar('15j. e o conserto de referência fecha a linha', await pagina.getByText('Line closed').waitFor({ timeout: 30000 }).then(() => true, () => false))
+  await pagina.goto(`${origem}/en/fase/09-a-funcao-que-confia-no-parametro/defesa/`)
+  await pagina.locator('table.grade').first().waitFor({ timeout: 60000 })
+  await rodarEmIngles()
+  checar('15k. o nome do uso legítimo de uma fase também vem traduzido', await pagina.getByText('alice still sees her own history through the function').first().waitFor({ timeout: 30000 }).then(() => true, () => false))
+  await pagina.goto(`${origem}/en/diario/`)
+  await pagina.getByRole('link', { name: 'Attack' }).waitFor({ timeout: 20000 })
+  checar('15l. o desafio diário em inglês é o mesmo de hoje, já feito', /Challenge for [A-Z][a-z]{2} \d+ · /.test(await pagina.locator('h1').innerText()) && (await pagina.getByText("Today's is done").count()) === 1, await pagina.locator('h1').innerText())
+  await pagina.goto(`${origem}/en/ajuda/`)
+  await pagina.locator('.sumario a').first().waitFor()
+  checar('15m. a ajuda em inglês tem as dez seções', (await pagina.locator('.sumario a').count()) === 10 && (await pagina.locator('main').innerText()).includes("What this game's supabase client has"))
+  checar('15n. o PGlite é um só para os dois idiomas', ![...baixado.keys()].some((c) => c.includes('/en/pglite')))
+  await foto('18-ingles-ajuda')
 
   await pagina.setViewportSize({ width: 390, height: 844 })
   await pagina.goto(`${origem}/fase/01-rls-desligado/defesa/`)

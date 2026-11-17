@@ -260,5 +260,14 @@
   "mapa.tesouroFim": "o fim da linha",
   "mapa.tesouroAchado": "você chegou ao fim da linha",
   "lab.compartilhar": "Copiar link",
-  "lab.linkCopiado": "Link copiado"
+  "lab.linkCopiado": "Link copiado",
+  "uso.donoAdiciona": "bruno, dono do time, continua adicionando gente a ele",
+  "uso.historicoPelaFuncao": "alice continua vendo o próprio histórico pela função",
+  "uso.criaCupons": "alice continua criando os próprios cupons",
+  "uso.relatorio": "o relatório da alice continua trazendo os pedidos dela",
+  "definicao.funcao": "função {nome}",
+  "definicao.restricao": "restrição em {nome}",
+  "comum.bancoNaoCarregou": "O banco do jogo não carregou.",
+  "idioma.trocar": "English",
+  "idioma.trocarTitulo": "Play in English"
 }

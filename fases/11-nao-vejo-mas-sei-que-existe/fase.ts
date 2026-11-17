@@ -15,7 +15,7 @@ export default defineFase({
   },
   usos: [
     {
-      nome: 'alice continua criando os próprios cupons',
+      nome: 'uso.criaCupons',
       como: 'alice',
       chamada: {
         tipo: 'from',

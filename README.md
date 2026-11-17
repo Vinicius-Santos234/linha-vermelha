@@ -8,13 +8,14 @@
   <img src="https://img.shields.io/badge/PGlite-0.2.17-a078e0?style=flat-square" alt="PGlite 0.2.17">
   <img src="https://img.shields.io/badge/Next.js-16%20est%C3%A1tico-e8708a?style=flat-square" alt="Next.js 16, estático">
   <img src="https://img.shields.io/badge/TypeScript-estrito-ff8a1f?style=flat-square" alt="TypeScript estrito">
-  <img src="https://img.shields.io/badge/idioma-PT--BR-fdc830?style=flat-square" alt="Idioma: PT-BR">
+  <img src="https://img.shields.io/badge/idiomas-PT--BR%20%C2%B7%20EN-fdc830?style=flat-square" alt="Idiomas: PT-BR e EN">
 </p>
 
 <h3 align="center">Invada o app. Conserte a falha. Não quebre nada.</h3>
 
 <p align="center">
-  <a href="https://linha-vermelha.vercel.app"><b>▶ Jogar agora: linha-vermelha.vercel.app</b></a>
+  <a href="https://linha-vermelha.vercel.app"><b>▶ Jogar agora: linha-vermelha.vercel.app</b></a><br>
+  <a href="https://linha-vermelha.vercel.app/en/">▶ Play in English: <b>Red-Line (Security)</b></a>
 </p>
 
 **Linha Vermelha** é um jogo de segurança que roda inteiro no navegador. Cada fase é um app de mentira, feito com Supabase, com uma falha de **Row Level Security** de verdade. Você ataca com o mesmo cliente `supabase` que qualquer visitante do site teria, e depois conserta as políticas em SQL.
@@ -25,13 +26,13 @@ Não tem servidor do jogo, não tem banco de terceiros e não tem flag para copi
   <img src="docs/demo.gif" alt="O jogo rodando: a abertura com a cena animada, o ataque à fase 1, a defesa com a grade em vermelho, o conserto e o laboratório" width="100%">
 </p>
 
-> **Estado:** no ar em [linha-vermelha.vercel.app](https://linha-vermelha.vercel.app), com treze fases, quatro modos e um desafio novo por dia. O que vem depois está em [Roteiro](#roteiro).
+> **Estado:** no ar em [linha-vermelha.vercel.app](https://linha-vermelha.vercel.app), com treze fases, quatro modos, um desafio novo por dia e dois idiomas. O que vem depois está em [Roteiro](#roteiro).
 
 ## Por que existe
 
 - **Ensina o erro pelos dois lados.** Atacar mostra por que a falha importa. Consertar mostra por que o conserto óbvio quase sempre quebra alguma coisa.
 - **RLS falha em silêncio.** Um app com a política errada funciona perfeitamente para quem o usa do jeito esperado. Só aparece quando alguém tenta o que não devia.
-- **Quase não existe prática de segurança em português.**
+- **Quase não existe prática de segurança em português.** O jogo nasceu em português e também se joga em inglês.
 
 ## Quatro modos, um motor
 
@@ -93,6 +94,15 @@ Todo dia tem uma fase nova, **igual para todo mundo**. Ela não é escrita por n
 - **Sequência.** Dias seguidos contam, e a sequência não zera antes de o dia acabar.
 
 As famílias são as fases 1, 2, 3, 4, 5, 8, 9 e 10 com outra roupa. As fases 6, 7 e 11 têm um desenho próprio demais para o sorteio e ficaram de fora.
+
+## Dois idiomas
+
+O jogo em inglês se chama **Red-Line (Security)**, cujas iniciais dão RLS, e mora em [`/en/`](https://linha-vermelha.vercel.app/en/). O cabeçalho de toda página tem o link para a mesma página no outro idioma.
+
+- **É o mesmo código, construído duas vezes.** O `npm run build` gera o site em português na raiz e depois o repete com `NEXT_PUBLIC_IDIOMA=en` e `basePath: '/en'`, copiando o resultado para `out/en/`. Nenhuma rota foi duplicada, nada troca de idioma em tempo de execução, e os dois Workers recebem o idioma do mesmo jeito que as telas.
+- **O progresso é um só.** Fases, estrelas e sequência valem nos dois idiomas, porque moram no navegador e na conta.
+- **Traduz-se o texto, e não o app.** Interface, briefings, dicas, explicações, ajuda, mensagens do motor e o desafio diário estão em inglês. Os apps de mentira continuam brasileiros: tabelas, colunas e dados (`pedidos`, `perfis`, a Padaria do Zé) são os mesmos, e o briefing em inglês diz o que cada um é. Assim o ataque, o conserto e o gabarito de uma fase são um só.
+- **Os testes não deixam a tradução ficar para trás.** O inglês tem de ter as mesmas chaves e os mesmos marcadores do português, toda fase tem de ter as mesmas seções, três dicas por modo e **o mesmo código** nas dicas, e o desafio diário é gerado em inglês para toda combinação de família e cenário.
 
 ## Design
 
@@ -193,11 +203,11 @@ Sem configuração, o progresso fica guardado no navegador. Para sincronizar com
 
 | Comando | O que confere |
 |---|---|
-| `npm test` | O motor, o tradutor, o cliente falso e todas as fases: a versão furada tem de cair no ataque de referência, e o conserto de referência tem de passar na bateria inteira |
+| `npm test` | O motor, o tradutor, o cliente falso e todas as fases: a versão furada tem de cair no ataque de referência, e o conserto de referência tem de passar na bateria inteira. E a paridade do inglês com o português |
 | `npm run typecheck` | Os tipos |
 | `npm run prova:node` · `prova:navegador` | O PGlite com RLS e sessão não-superusuário, em Node e num Web Worker. Rodar antes de trocar a versão do PGlite |
 | `npm run prova:jogador` | O Worker do jogador num navegador de verdade, com laço infinito e tudo |
-| `npm run prova:site` | O site exportado, jogado de ponta a ponta: as treze fases, os quatro modos, o console SQL e o desafio de hoje. Faz um build próprio, sem Firebase |
+| `npm run prova:site` | O site exportado, jogado de ponta a ponta: as treze fases, os quatro modos, o console SQL, o desafio de hoje e o inglês em `/en/`. Faz um build próprio, sem Firebase |
 | `npm run prova:diario` | O desafio diário de um ano inteiro, dia por dia, contra o banco. Leva alguns minutos |
 | `npm run prova:regras` | As regras do Firestore, no emulador (precisa de Java 17 ou mais novo) |
 | `npm run prova:nuvem` | O progresso na nuvem, contra os emuladores de Auth e Firestore |
@@ -214,6 +224,7 @@ fases/05-metadata-do-usuario/
 ├── politicas.sql        as políticas furadas: rodam no Ataque, e a Defesa começa por elas
 ├── fase.ts              usuários, login do jogador, objetivo e gabarito
 ├── pt-BR.md             briefings, dicas e a explicação
+├── en.md                o mesmo texto em inglês, com o mesmo código nas dicas
 ├── ataque.ts            ataque de referência   (só nos testes)
 ├── solucao.sql          conserto de referência (só nos testes)
 └── ataque.gravado.json  o ataque como chamadas, gerado por `npm run gravar`
@@ -247,7 +258,7 @@ Os testes não deixam uma fase impossível ou com o gabarito errado ir adiante: 
 | `desafio/` | O gerador do desafio diário e o conteúdo dos cenários |
 | `jogo/` | A cola entre as telas e o motor: Worker do banco, progresso, nuvem |
 | `app/` · `componentes/` | As telas |
-| `mensagens/` | Todo texto da interface, do motor e do cliente, separado por idioma |
+| `mensagens/` | Todo texto da interface, do motor e do cliente, separado por idioma (`pt-BR.json` e `en.json`), e a ajuda |
 | `provas/` | As provas de navegador |
 | `regras/` | Os testes das regras do Firestore |
 
@@ -261,7 +272,7 @@ Os testes não deixam uma fase impossível ou com o gabarito errado ir adiante: 
 - [x] Nível 4, com console SQL: o dono que não obedece ao RLS e o sequestro de `search_path`
 - [x] Laboratório com link compartilhável: o experimento vai no próprio endereço
 - [ ] Ranking com verificação no servidor, usando o mesmo motor
-- [ ] Inglês: os textos já estão separados por idioma
+- [x] Inglês: Red-Line (Security), em [`/en/`](https://linha-vermelha.vercel.app/en/)
 
 ## Licença
 

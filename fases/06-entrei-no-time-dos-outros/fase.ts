@@ -20,7 +20,7 @@ export default defineFase({
   },
   usos: [
     {
-      nome: 'bruno, dono do time, continua adicionando gente a ele',
+      nome: 'uso.donoAdiciona',
       como: 'bruno',
       chamada: {
         tipo: 'from',
