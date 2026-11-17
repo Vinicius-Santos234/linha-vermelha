@@ -5,6 +5,11 @@
 //
 // SAIDA escolhe a pasta exportada (padrão: out). SO_PT=1 pula o inglês, para provas que
 // não precisam dele.
+//
+// Na Vercel, o vercel.json desliga o preset do Next ("framework": null) e publica a pasta
+// out/ como site estático. Com o preset ligado, o adaptador do Next na Vercel grava a saída
+// do deploy no fim de cada `next build`, e o build do inglês apagava o do português: em
+// 17/11/2026 a raiz do site ficou em 404 e só /en/ respondia.
 import { spawnSync } from 'node:child_process'
 import { cp, readdir, rm } from 'node:fs/promises'
 import { join } from 'node:path'
